@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Yaaqob Ba Surra — Developer Portfolio</title>
+<title>Yaaqob Ba Surra</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -14,13 +14,13 @@
     --ink:#171018; --paper:#f4efe6;
     --grid-line: rgba(23,16,24,0.35);
     --text: var(--ink);
-    --text-soft: rgba(23,16,24,.75);
-    --text-faint: rgba(23,16,24,.45);
+    --text-soft: rgba(23,16,24,.7);
+    --text-faint: rgba(23,16,24,.4);
     --rule: rgba(23,16,24,.2);
   }
   body.night{
     --text:#f4efe6;
-    --text-soft: rgba(244,239,230,.8);
+    --text-soft: rgba(244,239,230,.75);
     --text-faint: rgba(244,239,230,.45);
     --rule: rgba(244,239,230,.22);
   }
@@ -35,7 +35,7 @@
   }
   html.lang-ar body{font-family:'Cairo', sans-serif;}
 
-  /* BACKDROP */
+  /* ============ BACKDROP ============ */
   .sky{
     position:fixed; inset:0; z-index:-3; overflow:hidden;
     background:linear-gradient(180deg, var(--sky-a-day) 0%, var(--sky-b-day) 45%, var(--sky-c-day) 78%, var(--sky-c-day) 100%);
@@ -63,6 +63,15 @@
   }
   @keyframes bob{ 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(16px);} }
 
+  .cloud{position:absolute; border-radius:50%; opacity:.85;
+    background:#fff;
+    box-shadow: 40px 10px 0 -6px #fff, -40px 6px 0 -10px #fff, 0 18px 0 -2px #fff;
+    animation:drift linear infinite;
+    transition:opacity 1s ease;
+  }
+  body.night .cloud{opacity:.12;}
+  @keyframes drift{ from{transform:translateX(-10vw);} to{transform:translateX(110vw);} }
+
   .floor{
     position:absolute; left:0; right:0; bottom:0; height:38%;
     background-image:
@@ -76,97 +85,190 @@
   }
   @keyframes floorMove{ from{background-position:0 0, 0 0;} to{background-position:0 40px, 60px 0;} }
 
-  /* CRT OVERLAY */
-  .crt{
-    position:fixed; inset:0; z-index:50; pointer-events:none;
-    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px);
-    mix-blend-mode:multiply;
+  .hero-palm{
+    position:fixed; right:-6vw; bottom:26vh;
+    width:min(52vw, 620px);
+    pointer-events:none;
+    z-index:-1;
+    transition:opacity 1s ease, filter 1s ease;
+    opacity:.96;
+  }
+  body.night .hero-palm{ opacity:.72; filter:brightness(.45); }
+  .hero-palm svg{ display:block; overflow:visible; }
+  .hero-palm .trunk{ transform-origin:52% 100%; animation:swayTrunk 11s ease-in-out infinite; }
+  .hero-palm .crown{ transform-origin:52% 100%; animation:swayCrown 11s ease-in-out infinite; }
+  @keyframes swayTrunk{
+    0%  { transform:rotate(-.7deg); }
+    28% { transform:rotate(.4deg); }
+    55% { transform:rotate(1.1deg); }
+    72% { transform:rotate(.2deg); }
+    100%{ transform:rotate(-.7deg); }
+  }
+  @keyframes swayCrown{
+    0%  { transform:rotate(-2.4deg); }
+    22% { transform:rotate(-.8deg); }
+    41% { transform:rotate(2.1deg); }
+    58% { transform:rotate(.4deg); }
+    79% { transform:rotate(1.6deg); }
+    100%{ transform:rotate(-2.4deg); }
+  }
+  .hero-palm .trunk-fill{ fill:#5a3e28; }
+  .hero-palm .frond-a{ fill:#1f6b3f; }
+  .hero-palm .frond-b{ fill:#175a34; }
+  .hero-palm .frond-c{ fill:#0f4728; }
+  body.night .hero-palm .trunk-fill{ fill:#0a0610; }
+  body.night .hero-palm .frond-a{ fill:#0a1414; }
+  body.night .hero-palm .frond-b{ fill:#081010; }
+  body.night .hero-palm .frond-c{ fill:#060c0c; }
+
+  @media (max-width:820px){
+    .hero-palm{ width:70vw; right:-14vw; bottom:22vh; opacity:.8; }
   }
 
-  /* NAVIGATION */
+  /* ============ CRT ============ */
+  .crt{
+    position:fixed; inset:0; z-index:50; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:multiply;
+  }
+  .roll-band{
+    position:fixed; left:0; right:0; height:70px; z-index:55;
+    pointer-events:none;
+    background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,.07) 40%, rgba(0,0,0,.06) 60%, transparent 100%);
+    mix-blend-mode:overlay;
+    animation:rollSweep 9s linear infinite;
+  }
+  @keyframes rollSweep{ 0%{ top:-90px; } 100%{ top:110vh; } }
+
+  .tv-burst{
+    position:fixed; inset:0; z-index:70; pointer-events:none; opacity:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.35) 0 2px, transparent 2px 4px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px),
+      rgba(255,255,255,.05);
+    mix-blend-mode:overlay;
+  }
+  .tv-burst.go{ animation:tvBurst .22s steps(3,end); }
+  @keyframes tvBurst{
+    0%{ opacity:0; transform:translateY(-1px); }
+    20%{ opacity:.85; transform:translateY(2px); }
+    40%{ opacity:.15; transform:translateY(-2px); }
+    60%{ opacity:.7; transform:translateY(1px); }
+    100%{ opacity:0; transform:translateY(0); }
+  }
+
+  /* ============ NAV ============ */
   .nav{
     position:fixed; top:0; left:0; right:0; z-index:40;
     display:flex; align-items:center; justify-content:space-between; gap:1rem;
-    background:rgba(244,239,230,.88);
-    backdrop-filter: blur(8px);
+    background:rgba(244,239,230,.86);
+    backdrop-filter: blur(6px);
     border-bottom:1px solid var(--rule);
-    padding:.8rem 1.6rem;
-    transition:background .5s ease;
+    padding:.7rem 1.4rem;
+    transition:background .5s ease, border-color .5s ease;
   }
-  body.night .nav{ background:rgba(15,8,24,.85); }
+  body.night .nav{ background:rgba(15,8,24,.82); }
 
-  .brand{font-family:'VT323', monospace; font-size:1.5rem; letter-spacing:2px; color:var(--text); text-decoration:none;}
-  html.lang-ar .brand{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0;}
+  .brand{font-family:'VT323', monospace; font-size:1.35rem; letter-spacing:2px; color:var(--text);}
+  html.lang-ar .brand{font-family:'Cairo',sans-serif; font-weight:800; font-size:1rem; letter-spacing:0;}
 
-  .nav-links{display:flex; gap:.4rem;}
+  .nav-links{display:flex; gap:.2rem; flex-wrap:wrap;}
   .nav-link{
-    font-family:'VT323', monospace; font-size:1.1rem; letter-spacing:1px;
+    font-family:'VT323', monospace; font-size:1.02rem; letter-spacing:1px;
     background:transparent; border:0; color:var(--text-soft);
-    padding:.3rem .8rem; cursor:pointer; text-transform:uppercase; text-decoration:none;
+    padding:.3rem .8rem; cursor:pointer; text-transform:uppercase;
+    position:relative;
+    transition:color .2s ease;
   }
-  html.lang-ar .nav-link{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700;}
-  .nav-link:hover{ color:var(--pink); }
+  html.lang-ar .nav-link{font-family:'Cairo',sans-serif; font-size:.82rem; font-weight:700;}
+  .nav-link:hover{ color:var(--text); }
+  .nav-link.active{ color:var(--pink); }
+  .nav-link.active::after{
+    content:""; position:absolute; left:.8rem; right:.8rem; bottom:.05rem;
+    height:2px; background:var(--pink);
+  }
 
-  .nav-right{display:flex; gap:.5rem;}
-  .btn-ui{
-    font-family:'VT323', monospace; font-size:1rem;
+  .nav-right{display:flex; gap:.4rem;}
+  .nav-right button{
+    font-family:'VT323', monospace; font-size:.95rem;
     border:1px solid var(--rule); background:transparent; color:var(--text);
-    padding:.3rem .7rem; cursor:pointer; font-weight:bold;
-    transition:all .2s ease;
+    padding:.28rem .65rem; cursor:pointer;
+    transition:background .15s ease, color .15s ease;
   }
-  html.lang-ar .btn-ui{font-family:'Cairo',sans-serif; font-size:.8rem;}
-  .btn-ui:hover{ background:var(--pink); color:#fff; border-color:var(--pink); }
+  html.lang-ar .nav-right button{font-family:'Cairo',sans-serif; font-size:.75rem;}
+  .nav-right button:hover{ background:var(--text); color:var(--paper); }
 
-  /* MAIN CONTENT */
-  main{ position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:8rem 2rem 5rem; }
-
-  /* HERO */
-  #hero{ margin-bottom:5rem; }
-  .kicker{
-    font-family:'VT323', monospace; font-size:1.2rem; letter-spacing:3px;
-    color:var(--pink); margin-bottom:.8rem; text-transform:uppercase;
+  /* ============ SECTIONS ============ */
+  main{ position:relative; z-index:2; }
+  section{
+    padding: 6.5rem 2rem 4rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    scroll-margin-top: 4rem;
   }
-  html.lang-ar .kicker{font-family:'Cairo',sans-serif; font-weight:800; font-size:.9rem; letter-spacing:0;}
+  section:first-of-type{ padding-top: 9rem; }
+  section:last-of-type{ padding-bottom: 8rem; }
+
+  /* hero */
+  #hero .kicker{
+    font-family:'VT323', monospace; font-size:1.1rem; letter-spacing:3px;
+    color:var(--pink); margin-bottom:1rem; text-transform:uppercase;
+  }
+  html.lang-ar #hero .kicker{font-family:'Cairo',sans-serif; font-weight:800; font-size:.85rem; letter-spacing:0;}
 
   #hero h1{
-    font-family:'VT323', monospace; font-size: clamp(3.2rem, 8vw, 6.5rem);
-    line-height:.95; letter-spacing:-1px; margin-bottom:1.5rem;
+    font-family:'VT323', monospace;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height:.95; letter-spacing:-1px;
+    font-weight:400;
+    margin-bottom:1.6rem;
+    color:var(--text);
   }
-  html.lang-ar #hero h1{font-family:'Cairo',sans-serif; font-weight:800; font-size:clamp(2.2rem,5vw,3.5rem);}
+  html.lang-ar #hero h1{font-family:'Cairo',sans-serif; font-weight:800; letter-spacing:0; font-size:clamp(2rem,5vw,3.4rem);}
 
-  .tagline{
-    font-size: clamp(1rem, 1.4vw, 1.2rem); line-height:1.7;
-    max-width: 55ch; color:var(--text-soft); margin-bottom:2rem;
+  #hero .tagline{
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    line-height:1.6;
+    max-width: 48ch;
+    color:var(--text-soft);
+    margin-bottom:2.4rem;
   }
 
-  .cta-row{ display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
-  .btn-action{
-    display:inline-flex; align-items:center; gap:.5rem;
-    font-family:'VT323', monospace; font-size:1.2rem; text-decoration:none;
-    padding:.6rem 1.4rem; background:var(--pink); color:#fff; border:2px solid var(--pink);
-    transition:transform .2s ease, background .2s ease;
+  #hero .contact-line{
+    display:flex; gap:1.6rem; flex-wrap:wrap;
+    font-size:.9rem; color:var(--text-soft);
   }
-  html.lang-ar .btn-action{font-family:'Cairo',sans-serif; font-size:.9rem; font-weight:800;}
-  .btn-action:hover{ transform:translateY(-2px); background:transparent; color:var(--pink); }
-
-  .btn-secondary{
-    background:transparent; color:var(--text); border:2px solid var(--rule);
+  #hero .contact-line a{
+    color:inherit; text-decoration:none;
+    border-bottom:1px solid var(--rule); padding-bottom:1px;
+    transition:color .2s, border-color .2s;
   }
-  .btn-secondary:hover{ border-color:var(--text); color:var(--text); background:transparent; }
+  #hero .contact-line a:hover{ color:var(--pink); border-color:var(--pink); }
 
-  /* SECTION HEADINGS */
+  /* section headings */
   .section-head{
-    display:flex; align-items:baseline; gap:1rem; margin:4rem 0 2rem;
-    border-bottom:1px solid var(--rule); padding-bottom:.8rem;
+    display:flex; align-items:baseline; gap:1rem; margin-bottom:3rem;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:1rem;
   }
-  .section-head .num{ font-family:'VT323', monospace; font-size:1.2rem; color:var(--pink); }
-  .section-head h2{ font-family:'VT323', monospace; font-size:2.2rem; font-weight:400; }
-  html.lang-ar .section-head h2{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.5rem;}
+  .section-head .num{
+    font-family:'VT323', monospace; font-size:1.1rem; color:var(--pink);
+    letter-spacing:2px;
+  }
+  .section-head h2{
+    font-family:'VT323', monospace; font-size:2rem; font-weight:400;
+    letter-spacing:1px; color:var(--text);
+  }
+  html.lang-ar .section-head h2{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.4rem; letter-spacing:0;}
 
-  /* PROJECTS */
+  /* ============ PROJECTS — the main event ============ */
   .project{
-    display:grid; grid-template-columns: 1.1fr 1fr; gap:3rem;
-    padding:3.5rem 0; border-bottom:1px solid var(--rule); align-items:center;
+    display:grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 3rem;
+    padding: 3.5rem 0;
+    border-bottom:1px solid var(--rule);
+    align-items: center;
   }
   .project:last-child{ border-bottom:0; }
   .project:nth-child(even){ direction:rtl; }
@@ -174,92 +276,307 @@
   html.lang-ar .project:nth-child(even){ direction:ltr; }
   html.lang-ar .project:nth-child(even) > *{ direction:rtl; }
 
-  .project h3{
-    font-family:'VT323', monospace; font-size: clamp(2rem, 3.5vw, 2.8rem);
-    line-height:1.1; margin-bottom:.5rem;
+  .project .p-text h3{
+    font-family:'VT323', monospace;
+    font-size: clamp(1.9rem, 3.8vw, 3rem);
+    line-height:1.05; font-weight:400;
+    margin-bottom:.5rem; letter-spacing:.5px;
+    color:var(--text);
   }
-  html.lang-ar .project h3{font-family:'Cairo',sans-serif; font-weight:800; font-size:clamp(1.4rem,2.5vw,1.8rem);}
+  html.lang-ar .project .p-text h3{font-family:'Cairo',sans-serif; font-weight:800; font-size:clamp(1.4rem,2.6vw,1.9rem); letter-spacing:0;}
 
   .project .p-meta{
-    font-family:'VT323', monospace; font-size:1.05rem; letter-spacing:1px;
-    color:var(--purple); margin-bottom:1.2rem; text-transform:uppercase;
+    font-family:'VT323', monospace;
+    font-size:1rem; letter-spacing:2px;
+    color:var(--purple); margin-bottom:1.5rem; text-transform:uppercase;
   }
-  html.lang-ar .project .p-meta{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700;}
+  html.lang-ar .project .p-meta{font-family:'Cairo',sans-serif; font-size:.8rem; letter-spacing:0; font-weight:700;}
 
-  .project p{ font-size:1rem; line-height:1.8; color:var(--text-soft); margin-bottom:1rem; }
-
-  .p-tags{ display:flex; flex-wrap:wrap; gap:.4rem; margin:1.5rem 0; }
-  .p-tags span{
-    font-family:'VT323', monospace; font-size:.85rem;
-    color:var(--text-soft); border:1px solid var(--rule); padding:.2rem .6rem;
+  .project .p-text p{
+    font-size:1rem; line-height:1.9;
+    color:var(--text-soft); margin-bottom:1.1rem;
+    max-width: 54ch;
   }
-  html.lang-ar .p-tags span{font-family:'Cairo',sans-serif; font-size:.75rem; font-weight:700;}
+  .project .p-text p:last-of-type{ margin-bottom:0; }
 
-  .p-links{ display:flex; gap:1rem; margin-top:1.5rem; }
-  .p-link{
-    font-family:'VT323', monospace; font-size:1.1rem; color:var(--text);
-    text-decoration:none; border-bottom:2px solid var(--pink); padding-bottom:2px;
-    transition:color .2s ease;
+  .project .p-tags{
+    display:flex; flex-wrap:wrap; gap:.45rem;
+    margin-top:1.8rem;
   }
-  html.lang-ar .p-link{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:800;}
-  .p-link:hover{ color:var(--pink); }
+  .project .p-tags span{
+    font-family:'VT323', monospace;
+    font-size:.82rem; letter-spacing:1px;
+    color:var(--text-soft);
+    border:1px solid var(--rule);
+    padding:.2rem .75rem;
+    text-transform:uppercase;
+  }
+  html.lang-ar .project .p-tags span{font-family:'Cairo',sans-serif; font-size:.72rem; font-weight:700; letter-spacing:0;}
 
-  /* VISUALS */
-  .p-vis{ display:flex; align-items:center; justify-content:center; min-height:280px; }
+  .project .p-vis{
+    display:flex; align-items:center; justify-content:center;
+    min-height:300px;
+    position:relative;
+  }
 
-  /* RECEIPT */
+  /* receipt visual */
   .prcpt{
-    background:#fff; color:#171018; padding:1.2rem; width:100%; max-width:270px;
-    font-family:'Cairo', sans-serif; font-size:.85rem; box-shadow:0 20px 40px rgba(0,0,0,.2);
-    border:1.5px dashed #171018; transform:rotate(-1deg); transition:transform .3s ease;
+    background:#fff; color:#171018;
+    padding:1.1rem 1.2rem;
+    width:100%; max-width:260px;
+    font-family:'Cairo',sans-serif;
+    font-size:.85rem;
+    direction:rtl; text-align:right;
+    box-shadow: 0 22px 45px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.1);
+    animation:printOut 6.5s ease-in-out infinite;
+    border:1.5px dashed #171018;
   }
-  .prcpt:hover{ transform:rotate(0deg) scale(1.02); }
-  .prcpt .t{ text-align:center; font-weight:800; border-bottom:1px dashed #171018; padding-bottom:.4rem; margin-bottom:.6rem; }
-  .prcpt .r{ display:flex; justify-content:space-between; padding:.2rem 0; }
-  .prcpt .tot{ border-top:1px dashed #171018; margin-top:.6rem; padding-top:.4rem; font-weight:800; }
-  .prcpt small{ display:block; text-align:center; margin-top:.6rem; color:#888; font-size:.65rem; }
+  body.night .prcpt{ box-shadow: 0 22px 60px rgba(0,0,0,.7), 0 0 30px rgba(138,92,255,.25); }
+  .prcpt .t{ text-align:center; font-weight:800; border-bottom:1px dashed #171018; padding-bottom:.4rem; margin-bottom:.55rem; letter-spacing:1px; }
+  .prcpt .r{ display:flex; justify-content:space-between; padding:.18rem 0; }
+  .prcpt .tot{ border-top:1px dashed #171018; margin-top:.55rem; padding-top:.45rem; font-weight:800; }
+  .prcpt small{ display:block; text-align:center; margin-top:.55rem; color:#999; font-size:.65rem; letter-spacing:1px; }
+  @keyframes printOut{
+    0%{ transform:translateY(50px) rotate(-1deg); opacity:0; clip-path:inset(0 0 100% 0); }
+    22%,78%{ transform:translateY(0) rotate(0); opacity:1; clip-path:inset(0 0 0 0); }
+    100%{ transform:translateY(0) rotate(0); opacity:0; clip-path:inset(0 0 100% 0); }
+  }
 
-  /* TERMINAL */
+  /* terminal visual */
   .pterm{
-    background:#0c0812; color:#d8f5d0; font-family:'VT323', monospace; font-size:1.2rem;
-    padding:1.2rem; width:100%; max-width:380px; border:1px solid rgba(216,245,208,.3);
-    box-shadow:0 20px 40px rgba(0,0,0,.4);
+    background:#0c0812; color:#d8f5d0;
+    font-family:'VT323', monospace; font-size:1.25rem; line-height:1.65;
+    padding:1.1rem 1.3rem;
+    width:100%; max-width:400px;
+    direction:ltr; text-align:left;
+    box-shadow: 0 22px 55px rgba(0,0,0,.35), 0 0 40px rgba(0,216,230,.12);
+    border:1px solid rgba(216,245,208,.2);
   }
-  .pterm .bar{ display:flex; gap:.3rem; margin-bottom:.8rem; border-bottom:1px solid rgba(216,245,208,.15); padding-bottom:.4rem; }
-  .pterm .bar i{ width:8px; height:8px; border-radius:50%; background:rgba(216,245,208,.4); }
-  .pterm .y{ color:#ffd85e; } .pterm .g{ color:#7be28b; } .pterm .c{ color:#00d8e6; }
+  body.night .pterm{ box-shadow: 0 22px 65px rgba(0,0,0,.7), 0 0 50px rgba(0,216,230,.2); }
+  .pterm .bar{
+    display:flex; gap:.35rem; margin-bottom:.75rem; padding-bottom:.55rem;
+    border-bottom:1px solid rgba(216,245,208,.15);
+  }
+  .pterm .bar i{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(216,245,208,.3); display:inline-block;
+  }
+  .pterm .bar i:nth-child(1){ background:#ff8fa3; }
+  .pterm .bar i:nth-child(2){ background:#ffd85e; }
+  .pterm .bar i:nth-child(3){ background:#7be28b; }
+  .pterm .y{ color:#ffd85e; } .pterm .r{ color:#ff8fa3; } .pterm .g{ color:#7be28b; } .pterm .c{ color:#00d8e6; }
+  .pterm .l{ display:block; overflow:hidden; white-space:nowrap; width:0; animation:typeLine 10s steps(28,end) infinite; }
+  .pterm .l:nth-child(2){ animation-delay:.7s; }
+  .pterm .l:nth-child(3){ animation-delay:1.4s; }
+  .pterm .l:nth-child(4){ animation-delay:2.1s; }
+  .pterm .l:nth-child(5){ animation-delay:2.8s; }
+  .pterm .l:nth-child(6){ animation-delay:3.5s; }
+  .pterm .l:nth-child(7){ animation-delay:4.2s; }
+  .pterm .l:nth-child(8){ animation-delay:4.9s; }
+  @keyframes typeLine{
+    0%{ width:0; }
+    5%, 85%{ width:100%; }
+    92%, 100%{ width:0; }
+  }
 
-  /* SKILLS GRID */
-  .tech-grid{
-    display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-top:2rem;
-  }
-  .tech-card{
-    border:1px solid var(--rule); padding:1.5rem; background:rgba(255,255,255,.03);
-    transition:border-color .2s ease;
-  }
-  .tech-card:hover{ border-color:var(--pink); }
-  .tech-card h4{ font-family:'VT323', monospace; font-size:1.3rem; color:var(--pink); margin-bottom:.5rem; }
-  html.lang-ar .tech-card h4{ font-family:'Cairo',sans-serif; font-weight:800; font-size:1rem; }
-  .tech-card p{ font-size:.9rem; color:var(--text-soft); line-height:1.6; }
 
-  /* FOOTER & TERMINAL CONTACT */
-  #contact{ margin-top:4rem; }
+  /* application workflow visual */
+  .appflow{
+    width:100%; max-width:390px;
+    background:rgba(244,239,230,.94);
+    color:#171018;
+    border:1px solid rgba(23,16,24,.25);
+    box-shadow:0 22px 55px rgba(0,0,0,.2), 10px 10px 0 rgba(0,216,230,.18);
+    padding:1rem 1.05rem 1.15rem;
+    font-family:'Space Mono', monospace;
+    animation:appFloat 6s ease-in-out infinite;
+  }
+  body.night .appflow{
+    background:rgba(20,13,31,.96);
+    color:#f4efe6;
+    border-color:rgba(244,239,230,.22);
+    box-shadow:0 22px 65px rgba(0,0,0,.65), 10px 10px 0 rgba(0,216,230,.15);
+  }
+  .appflow .appbar{
+    display:flex; align-items:center; gap:.35rem;
+    padding-bottom:.75rem; margin-bottom:.9rem;
+    border-bottom:1px solid currentColor;
+    opacity:.82;
+  }
+  .appflow .appbar i{
+    display:inline-block; width:9px; height:9px; border-radius:50%;
+    background:#ff8fa3;
+  }
+  .appflow .appbar i:nth-child(2){background:#ffd85e;}
+  .appflow .appbar i:nth-child(3){background:#7be28b;}
+  .appflow .appbar span{
+    margin-left:auto; font-size:.62rem; letter-spacing:1px;
+  }
+  .appflow .app-title{
+    color:#8a5cff; font-size:.76rem; font-weight:700;
+    letter-spacing:1.1px; margin-bottom:.9rem;
+  }
+  .appflow .app-row{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:1rem; padding:.55rem 0;
+    border-bottom:1px dashed rgba(23,16,24,.22);
+    font-size:.7rem;
+  }
+  body.night .appflow .app-row{border-bottom-color:rgba(244,239,230,.22);}
+  .appflow .app-row:last-of-type{border-bottom:0;}
+  .appflow .label{opacity:.62;}
+  .appflow .value{font-weight:700; text-align:right;}
+  .appflow .status{
+    display:inline-block;
+    color:#146c3b; background:rgba(123,226,139,.2);
+    border:1px solid rgba(20,108,59,.32);
+    padding:.18rem .42rem;
+    font-size:.62rem; font-weight:700; text-transform:uppercase;
+  }
+  body.night .appflow .status{
+    color:#aaf0b6; border-color:rgba(170,240,182,.4);
+  }
+  .appflow .app-actions{display:flex; gap:.5rem; margin-top:1rem;}
+  .appflow .app-actions span{
+    flex:1; text-align:center; padding:.45rem .3rem;
+    border:1px solid currentColor; font-size:.64rem;
+    font-weight:700; letter-spacing:.4px;
+  }
+  .appflow .app-actions span:first-child{background:#171018; color:#f4efe6;}
+  body.night .appflow .app-actions span:first-child{background:#f4efe6; color:#171018;}
+  @keyframes appFloat{
+    0%,100%{transform:translateY(0) rotate(.7deg);}
+    50%{transform:translateY(-10px) rotate(-.7deg);}
+  }
+
+  /* ============ ABOUT — lighter, supporting only ============ */
+  .about-intro{
+    font-size:1.05rem; line-height:1.85;
+    color:var(--text-soft);
+    max-width: 62ch;
+    margin-bottom: 3rem;
+  }
+
+  .about-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem 4rem;
+  }
+  .about-col h4{
+    font-family:'VT323', monospace;
+    font-size:1.1rem; letter-spacing:2px;
+    color:var(--pink); text-transform:uppercase;
+    margin-bottom:1.3rem;
+    font-weight:400;
+  }
+  html.lang-ar .about-col h4{font-family:'Cairo',sans-serif; font-weight:800; font-size:.85rem; letter-spacing:0;}
+
+  .entry{
+    margin-bottom:1.5rem;
+    padding-bottom:1.5rem;
+    border-bottom:1px solid var(--rule);
+  }
+  .entry:last-child{ border-bottom:0; padding-bottom:0; margin-bottom:0; }
+
+  .entry .e-role{
+    font-size:.95rem; font-weight:700;
+    color:var(--text);
+    margin-bottom:.1rem;
+  }
+  html.lang-ar .entry .e-role{font-weight:800;}
+  .entry .e-org{
+    font-size:.82rem; color:var(--purple);
+    margin-bottom:.15rem;
+  }
+  .entry .e-date{
+    font-family:'VT323', monospace;
+    font-size:.8rem; letter-spacing:1.5px;
+    color:var(--cyan); text-transform:uppercase;
+  }
+  html.lang-ar .entry .e-date{font-family:'Cairo',sans-serif; font-size:.7rem; letter-spacing:0;}
+
+  .tag-cloud{
+    display:flex; flex-wrap:wrap; gap:.35rem .55rem;
+    margin-top:.4rem;
+  }
+  .tag-cloud span{
+    font-size:.8rem;
+    color:var(--text-soft);
+    padding:.12rem 0;
+    border-bottom:1px dashed var(--rule);
+  }
+  .tag-cloud span::after{ content:"·"; margin-inline-start:.5rem; color:var(--text-faint); }
+  .tag-cloud span:last-child::after{ content:""; }
+
+  /* ============ CONTACT ============ */
+  #contact{
+    border-top:1px solid var(--rule);
+    margin-top:3rem;
+  }
   .terminal{
-    font-family:'VT323', monospace; font-size:1.3rem; line-height:1.8;
-    background:rgba(0,0,0,.05); padding:1.5rem; border:1px dashed var(--rule);
+    font-family:'VT323', monospace;
+    font-size:1.35rem; line-height:2.05;
+    color:var(--text);
+    max-width: 720px;
   }
-  html.lang-ar .terminal{ font-family:'Cairo',sans-serif; font-size:.95rem; }
-  .terminal a{ color:var(--cyan); text-decoration:none; }
-  .terminal a:hover{ text-decoration:underline; }
+  html.lang-ar .terminal{font-family:'Cairo',sans-serif; font-size:1rem; line-height:2;}
+  .terminal .prompt{ color:var(--pink); }
+  .terminal a{ color:var(--cyan); text-decoration:none; border-bottom:1px dotted var(--cyan); }
+  .terminal a:hover{ color:var(--pink); border-color:var(--pink); }
+  .cursor{
+    display:inline-block; width:10px; height:1.1em;
+    background:currentColor;
+    animation:blink 1s steps(1) infinite;
+    vertical-align:-2px; margin-inline-start:6px;
+  }
+  @keyframes blink{ 50%{opacity:0;} }
 
-  footer{ text-align:center; font-family:'VT323', monospace; font-size:1rem; color:var(--text-faint); padding:4rem 0 2rem; }
-  html.lang-ar footer{ font-family:'Cairo',sans-serif; font-size:.8rem; }
+  footer{
+    position:relative; z-index:2;
+    text-align:center;
+    font-family:'VT323', monospace;
+    font-size:.85rem; letter-spacing:3px;
+    color:var(--text-faint);
+    padding:2rem 1rem 3rem;
+    text-transform:uppercase;
+  }
+  html.lang-ar footer{font-family:'Cairo',sans-serif; font-size:.72rem; letter-spacing:0;}
 
-  @media (max-width: 768px){
-    main{ padding-top:6rem; }
+  /* social row under contact */
+  .social-row{
+    display:flex; gap:1.4rem; flex-wrap:wrap;
+    margin-top:2.2rem;
+  }
+  .social-row a{
+    font-family:'VT323', monospace;
+    font-size:1.05rem; letter-spacing:1px;
+    color:var(--text-soft);
+    text-decoration:none;
+    border:1px solid var(--rule);
+    padding:.45rem 1rem;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  html.lang-ar .social-row a{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700; letter-spacing:0;}
+  .social-row a:hover{
+    color:var(--pink);
+    border-color:var(--pink);
+  }
+
+  @media (max-width: 820px){
+    section{ padding:5rem 1.4rem 3rem; }
+    section:first-of-type{ padding-top:7.5rem; }
     .project{ grid-template-columns:1fr; gap:2rem; }
     .project:nth-child(even){ direction:ltr; }
+    .project .p-vis{ min-height:220px; }
+    .about-grid{ grid-template-columns:1fr; gap:2rem; }
     .nav{ padding:.6rem 1rem; }
+    .nav-links{ order:3; width:100%; justify-content:flex-start; overflow-x:auto; }
+    .nav-link{ padding:.3rem .6rem; font-size:.9rem; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation-duration:0s!important; animation-iteration-count:1!important; transition-duration:.01s!important; }
+    .pterm .l{ width:100%; }
   }
 </style>
 </head>
@@ -268,21 +585,63 @@
 <div class="sky">
   <div class="stars" id="stars"></div>
   <div class="sun"></div>
+  <div class="cloud" style="width:140px;height:44px; top:12%; left:8%; animation-duration:42s;"></div>
+  <div class="cloud" style="width:180px;height:52px; top:24%; left:60%; animation-duration:56s; animation-delay:-12s;"></div>
+  <div class="cloud" style="width:110px;height:36px; top:34%; left:35%; animation-duration:48s; animation-delay:-24s;"></div>
   <div class="floor"></div>
 </div>
 
+<div class="hero-palm" aria-hidden="true">
+  <svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
+    <g class="trunk">
+      <path class="trunk-fill" d="M142 520
+        C138 460, 130 400, 138 340
+        C146 285, 152 240, 158 190
+        C160 175, 168 165, 182 160
+        L188 168
+        C176 174, 170 184, 168 196
+        C162 240, 156 288, 148 342
+        C142 400, 150 462, 154 520 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M132 470 L158 470 L158 476 L132 476 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M130 420 L160 420 L160 426 L130 426 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M132 370 L163 370 L163 376 L132 376 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M138 320 L167 320 L167 326 L138 326 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M146 270 L170 270 L170 276 L146 276 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M154 220 L178 220 L178 226 L154 226 Z"/>
+    </g>
+    <g class="crown">
+      <circle class="trunk-fill" cx="166" cy="168" r="6"/>
+      <circle class="trunk-fill" cx="180" cy="170" r="6"/>
+      <circle class="trunk-fill" cx="174" cy="180" r="5"/>
+      <path class="frond-a" d="M182 160 C120 130, 50 130, 10 168 C50 152, 110 152, 178 168 Z"/>
+      <path class="frond-b" d="M180 162 C110 152, 40 176, 18 220 C60 190, 120 180, 176 176 Z"/>
+      <path class="frond-c" d="M182 160 C130 172, 80 210, 70 258 C100 220, 150 190, 180 176 Z"/>
+      <path class="frond-a" d="M186 158 C250 128, 320 128, 360 166 C320 150, 260 150, 190 166 Z"/>
+      <path class="frond-b" d="M188 160 C256 150, 324 176, 346 218 C304 188, 244 178, 190 174 Z"/>
+      <path class="frond-c" d="M186 160 C240 172, 288 210, 298 256 C268 218, 220 190, 190 176 Z"/>
+      <path class="frond-b" d="M184 158 C172 110, 172 60, 194 30 C196 70, 192 120, 186 158 Z"/>
+      <path class="frond-c" d="M184 158 C200 118, 228 84, 260 80 C240 110, 210 138, 186 158 Z"/>
+      <path class="frond-c" d="M182 160 C168 122, 140 92, 108 92 C130 118, 158 142, 182 160 Z"/>
+      <path class="frond-c" d="M182 162 C150 196, 140 240, 150 292 C168 246, 178 204, 184 168 Z"/>
+    </g>
+  </svg>
+</div>
+
 <div class="crt"></div>
+<div class="roll-band"></div>
+<div class="tv-burst" id="tvBurst"></div>
 
 <nav class="nav">
-  <a href="#hero" class="brand">YAAQOB.DEV</a>
-  <div class="nav-links">
-    <a href="#work" class="nav-link" data-en="Work" data-ar="الأعمال">Work</a>
-    <a href="#skills" class="nav-link" data-en="Stack" data-ar="التقنيات">Stack</a>
-    <a href="#contact" class="nav-link" data-en="Contact" data-ar="تواصل">Contact</a>
+  <div class="brand">YAAQOB.SYS</div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link active" data-target="hero">Home</button>
+    <button class="nav-link" data-target="work">Work</button>
+    <button class="nav-link" data-target="about">About</button>
+    <button class="nav-link" data-target="contact">Contact</button>
   </div>
   <div class="nav-right">
-    <button class="btn-ui" id="themeToggle">🌙</button>
-    <button class="btn-ui" id="langToggle">AR</button>
+    <button id="themeToggle">🌙</button>
+    <button id="langToggle">AR</button>
   </div>
 </nav>
 
@@ -290,94 +649,151 @@
 
   <!-- HERO -->
   <section id="hero">
-    <div class="kicker" id="heroKicker">Software Developer · Systems & Web</div>
+    <div class="kicker" id="heroKicker">Computer Science · Jeddah</div>
     <h1 id="heroName">Yaaqob Ba Surra</h1>
     <p class="tagline" id="heroTagline"></p>
-    <div class="cta-row">
-      <a class="btn-action" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">
-        <span>GitHub</span> ↗
-      </a>
-      <a class="btn-action btn-secondary" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">
-        <span>LinkedIn</span> ↗
-      </a>
+    <div class="contact-line">
+      <a id="mailLink" href="mailto:Yaaqobbasurra@gmail.com">Yaaqobbasurra@gmail.com</a>
+      <a id="ghLink" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">GitHub</a>
+      <a id="liLink" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">LinkedIn</a>
+      <span id="locLine">Jeddah, Saudi Arabia</span>
     </div>
   </section>
 
-  <!-- WORK -->
+  <!-- WORK / PROJECTS — main focus -->
   <section id="work">
     <div class="section-head">
       <span class="num">01</span>
-      <h2 data-en="Featured Projects" data-ar="المشاريع المختارة">Featured Projects</h2>
+      <h2 data-en="Selected work" data-ar="أعمال مختارة">Selected work</h2>
     </div>
 
-    <!-- PROJECT 1 -->
     <article class="project">
       <div class="p-text">
-        <h3 data-en="Emergency Web POS & Receipt Engine" data-ar="محرك إيصالات ونقاط بيع للطوارئ">Emergency Web POS & Receipt Engine</h3>
-        <div class="p-meta" data-en="Client-Side Web App · Built in 24 Hours" data-ar="تطبيق ويب عملي · بني خلال 24 ساعة">Client-Side Web App · Built in 24 Hours</div>
-        <p data-en="When an active shop's primary POS database crashed overnight, I engineered a zero-dependency web-based checkout system to prevent business downtime." data-ar="عندما تعطلت قاعدة بيانات نقاط البيع الرئيسية لأحد المحلات، قمت بتطوير نظام كاشير وإيصالات يعمل عبر المتصفح بدون أي مكتبات خارجية لتجنب توقف المبيعات.">When an active shop's primary POS database crashed overnight, I engineered a zero-dependency web-based checkout system to prevent business downtime.</p>
-        <p data-en="Features multi-user sessions, sequential invoice indexing, VAT calculation, dynamic RTL receipt previews, browser storage recovery, and instant thermal printing output." data-ar="يتضمن جلسات دخول متعددة، ترقيم متسلسل للفواتير، حساب القيمة المضافة، معاينة حية للإيصال بدعم للغة العربية، وحفظ البيانات محلياً مع الطباعة الحرارية.">Features multi-user sessions, sequential invoice indexing, VAT calculation, dynamic RTL receipt previews, browser storage recovery, and instant thermal printing output.</p>
-        <div class="p-tags">
-          <span>JavaScript (ES6)</span><span>DOM Manipulation</span><span>localStorage</span><span>RTL Printing</span>
-        </div>
-        <div class="p-links">
-          <a class="p-link" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-en="View Source Code ↗" data-ar="عرض الكود البرمجي ↗">View Source Code ↗</a>
-        </div>
+        <h3 data-en="Community Application Portal" data-ar="بوابة طلبات للمجتمع">Community Application Portal</h3>
+        <div class="p-meta" data-en="Web application · form-to-review workflow · Google Sheets log" data-ar="تطبيق ويب · مسار من النموذج إلى المراجعة · سجل Google Sheets">Web application · form-to-review workflow · Google Sheets log</div>
+        <p data-en="Built a small web app to make applications for a private community easier to submit and review. Instead of collecting requests through messages, applicants complete a structured form and each submission is recorded in a Google Sheets log." data-ar="بنيت تطبيق ويب صغيراً يجعل تقديم الطلبات ومراجعتها أسهل لمجتمع خاص. بدلاً من جمع الطلبات عبر الرسائل، يملأ المتقدمون نموذجاً منظماً ويُسجَّل كل طلب في سجل على Google Sheets.">Built a small web app to make applications for a private community easier to submit and review. Instead of collecting requests through messages, applicants complete a structured form and each submission is recorded in a Google Sheets log.</p>
+        <p data-en="The review page reads the submitted details into one view, so I can check an application and mark it accepted or declined. The project gave me hands-on practice connecting a front-end form to a simple data workflow and building a clear admin review step." data-ar="تقرأ صفحة المراجعة البيانات المقدمة في عرض واحد، لأتمكن من فحص الطلب وتحديد قبوله أو رفضه. منحني المشروع تجربة عملية في ربط نموذج واجهة أمامية بمسار بيانات بسيط وبناء خطوة مراجعة إدارية واضحة.">The review page reads the submitted details into one view, so I can check an application and mark it accepted or declined. The project gave me hands-on practice connecting a front-end form to a simple data workflow and building a clear admin review step.</p>
+        <div class="p-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Google Sheets</span><span>Form Workflow</span></div>
       </div>
       <div class="p-vis">
-        <div class="prcpt" id="receiptBox">
-          <!-- Dynamically Injected via JS -->
+        <div class="appflow" aria-hidden="true">
+          <div class="appbar"><i></i><i></i><i></i><span>REVIEW PANEL</span></div>
+          <div class="app-title">APPLICATION DETAILS</div>
+          <div class="app-row"><span class="label">Applicant</span><span class="value">New submission</span></div>
+          <div class="app-row"><span class="label">Source</span><span class="value">Google Sheets</span></div>
+          <div class="app-row"><span class="label">Status</span><span class="status">Pending review</span></div>
+          <div class="app-actions"><span>ACCEPT</span><span>DECLINE</span></div>
         </div>
       </div>
     </article>
 
-    <!-- PROJECT 2 -->
     <article class="project">
       <div class="p-text">
-        <h3 data-en="PS4 Arch Linux Kernel Adaptation" data-ar="تطويع نواة أرتش لينكس لجهاز PS4">PS4 Arch Linux Kernel Adaptation</h3>
-        <div class="p-meta" data-en="Hardware & Bootchain Engineering" data-ar="هندسة العتاد وسلسلة الإقلاع">Hardware & Bootchain Engineering</div>
-        <p data-en="Overcame locked bootloader restrictions on PlayStation 4 hardware to establish a stable CachyOS (Arch-based Linux) environment." data-ar="تجاوزت قيود أداة الإقلاع المقفلة على جهاز بلايستيشن 4 لإنشاء بيئة عمل مستقرة بنظام CachyOS المبني على أرتش لينكس.">Overcame locked bootloader restrictions on PlayStation 4 hardware to establish a stable CachyOS (Arch-based Linux) environment.</p>
-        <p data-en="Handled kernel parameter matching, payload patching, memory mapping, and resolving driver/display output issues without official system documentation." data-ar="عالجت التوافق بين النواة وملفات الإقلاع البدائية، وتتبع خرائط الذاكرة، وحل مشكلات التعريفات وشاشات العرض بدون وثائق رسمية.">Handled kernel parameter matching, payload patching, memory mapping, and resolving driver/display output issues without official system documentation.</p>
+        <h3 data-en="Invoice & Receipt Generator" data-ar="مولّد الفواتير والإيصالات">Invoice & Receipt Generator</h3>
+        <div class="p-meta" data-en="Point-of-sale app · built in one day · in real use" data-ar="تطبيق نقطة بيع · بني في يوم · مستخدم فعلياً">Point-of-sale app · built in one day · in real use</div>
+        <p data-en="At work, the main POS system went down. The shop had to open the next morning. No system meant no way to issue receipts — no way to sell." data-ar="في العمل توقف نظام نقاط البيع الرئيسي. وكان على المحل أن يفتح في الصباح التالي. لا نظام يعني لا إيصالات — لا بيع.">At work, the main POS system went down. The shop had to open the next morning. No system meant no way to issue receipts — no way to sell.</p>
+        <p data-en="So I wrote one. Plain HTML, CSS, JavaScript. Arabic RTL interface, multi-user login, sequential invoice numbers, VAT-inclusive pricing, live receipt preview, print output, and every receipt saved locally in the browser so nothing was lost when the real system came back online." data-ar="فكتبت واحداً. HTML وCSS وجافاسكربت صافية. واجهة عربية من اليمين لليسار، تسجيل دخول لعدة مستخدمين، أرقام فواتير متسلسلة، تسعير شامل ضريبة القيمة المضافة، معاينة حية للإيصال، إخراج للطباعة، وكل إيصال محفوظ محلياً في المتصفح حتى لا يضيع شيء عند عودة النظام الأصلي.">So I wrote one. Plain HTML, CSS, JavaScript. Arabic RTL interface, multi-user login, sequential invoice numbers, VAT-inclusive pricing, live receipt preview, print output, and every receipt saved locally in the browser so nothing was lost when the real system came back online.</p>
+        <p data-en="It worked the next morning. The shop sold. When the real system came back, the saved receipts were used to log every sale." data-ar="عمل في الصباح التالي. وباع المحل. وعندما عاد النظام الحقيقي، استُخدمت الإيصالات المحفوظة لتسجيل كل عملية بيع.">It worked the next morning. The shop sold. When the real system came back, the saved receipts were used to log every sale.</p>
         <div class="p-tags">
-          <span>Linux Kernel</span><span>CachyOS</span><span>bzImage/initramfs</span><span>Hardware Diagnostics</span>
+          <span>HTML</span><span>CSS</span><span>JavaScript</span><span>localStorage</span><span>RTL Arabic</span>
         </div>
-        <div class="p-links">
-          <a class="p-link" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-en="Documentation & Logs ↗" data-ar="التوثيق والسجلات ↗">Documentation & Logs ↗</a>
+      </div>
+      <div class="p-vis">
+        <div class="prcpt">
+          <div class="t">إيصال بيع</div>
+          <div class="r"><span>منتج ١</span><span>٤٠٫٠٠</span></div>
+          <div class="r"><span>منتج ٢</span><span>٢٥٫٠٠</span></div>
+          <div class="r tot"><span>الإجمالي</span><span>٦٥٫٠٠</span></div>
+          <small>sample · receipt-maker.exe</small>
+        </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="p-text">
+        <h3 data-en="Linux on a PlayStation 4" data-ar="لينكس على بلايستيشن 4">Linux on a PlayStation 4</h3>
+        <div class="p-meta" data-en="CachyOS on locked hardware · working" data-ar="CachyOS على عتاد مقفل · يعمل">CachyOS on locked hardware · working</div>
+        <p data-en="A PlayStation 4 does not want to run Linux. Locked boot process, no normal install path, and most public guides assume a different hardware revision — following them just bricks the attempt." data-ar="بلايستيشن 4 لا يريد تشغيل لينكس. عملية إقلاع مقفلة، ولا مسار تثبيت عادي، وأغلب الشروحات العامة تفترض إصدار عتاد مختلف — اتباعها يعني فشل المحاولة.">A PlayStation 4 does not want to run Linux. Locked boot process, no normal install path, and most public guides assume a different hardware revision — following them just bricks the attempt.</p>
+        <p data-en="The bottleneck was finding a bzImage and an initramfs that actually fit each other on this board. I tested combinations until a pair booted, then worked through storage, display output, and driver issues one at a time." data-ar="العقبة كانت إيجاد bzImage وinitramfs يتوافقان فعلاً على هذه اللوحة. جربت تركيبات حتى أقلع زوج منها، ثم حللت مشاكل التخزين والإخراج المرئي والتعريفات واحدة تلو الأخرى.">The bottleneck was finding a bzImage and an initramfs that actually fit each other on this board. I tested combinations until a pair booted, then worked through storage, display output, and driver issues one at a time.</p>
+        <p data-en="Result: an Arch-based Linux (CachyOS) running on the console. What I actually learned was the shape of the Linux boot chain and how to find answers when the guide doesn't exist yet." data-ar="النتيجة: لينكس قائم على Arch (CachyOS) يعمل على الجهاز. وما تعلمته فعلاً هو شكل سلسلة إقلاع لينكس وكيف أجد الإجابات حين لا يوجد شرح جاهز بعد.">Result: an Arch-based Linux (CachyOS) running on the console. What I actually learned was the shape of the Linux boot chain and how to find answers when the guide doesn't exist yet.</p>
+        <div class="p-tags">
+          <span>Linux</span><span>CachyOS</span><span>bzImage</span><span>initramfs</span><span>Troubleshooting</span>
         </div>
       </div>
       <div class="p-vis">
         <div class="pterm">
           <div class="bar"><i></i><i></i><i></i></div>
-          <div><span class="c">root@ps4-cachy</span>:<span class="y">~</span># uname -r</div>
-          <div>6.8.9-cachyos-ps4</div>
-          <div><span class="c">root@ps4-cachy</span>:<span class="y">~</span># status</div>
-          <div>GPU: Driver Loaded [<span class="g">OK</span>]</div>
-          <div>Display: 1080p @ 60Hz [<span class="g">OK</span>]</div>
-          <div>Bootchain: Fully Verified [<span class="g">OK</span>]</div>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load kernel</span>
+          <span class="l">&nbsp;&nbsp;checking bzImage... <span class="r">?</span></span>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load initramfs</span>
+          <span class="l">&nbsp;&nbsp;checking initramfs... <span class="r">?</span></span>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ do they match?</span>
+          <span class="l">&nbsp;&nbsp;scanning... <span class="r">..</span></span>
+          <span class="l">&nbsp;&nbsp;scanning... <span class="r">.....</span></span>
+          <span class="l g">&nbsp;&nbsp;yes. finally. booting.</span>
         </div>
       </div>
     </article>
   </section>
 
-  <!-- STACK -->
-  <section id="skills">
+  <!-- ABOUT — supporting only -->
+  <section id="about">
     <div class="section-head">
       <span class="num">02</span>
-      <h2 data-en="Technical Focus" data-ar="التركيز التقني">Technical Focus</h2>
+      <h2 data-en="Background" data-ar="نبذة">Background</h2>
     </div>
 
-    <div class="tech-grid">
-      <div class="tech-card">
-        <h4 data-en="Frontend Development" data-ar="تطوير الواجهات">Frontend Development</h4>
-        <p data-en="Clean vanilla HTML/CSS/JavaScript, responsive layouts, RTL/LTR localization, dynamic DOM systems." data-ar="بناء واجهات باستخدام HTML/CSS/JavaScript، تصميم متجاوب، دعم كامل للغتين العربية والإنجليزية.">Clean vanilla HTML/CSS/JavaScript, responsive layouts, RTL/LTR localization, dynamic DOM systems.</p>
+    <p class="about-intro" id="aboutIntro"></p>
+
+    <div class="about-grid">
+      <div class="about-col">
+        <h4 data-en="Experience" data-ar="الخبرة">Experience</h4>
+        <div class="entry">
+          <div class="e-role" id="w1r"></div>
+          <div class="e-org" id="w1o"></div>
+          <div class="e-date" id="w1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" id="w2r"></div>
+          <div class="e-org" id="w2o"></div>
+          <div class="e-date" id="w2d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" id="w3r"></div>
+          <div class="e-org" id="w3o"></div>
+          <div class="e-date" id="w3d"></div>
+        </div>
+
+        <h4 style="margin-top:2.2rem;" data-en="Volunteering" data-ar="التطوع">Volunteering</h4>
+        <div class="entry">
+          <div class="e-role" id="v1r"></div>
+          <div class="e-org" id="v1o"></div>
+          <div class="e-date" id="v1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" id="v2r"></div>
+          <div class="e-org" id="v2o"></div>
+          <div class="e-date" id="v2d"></div>
+        </div>
       </div>
-      <div class="tech-card">
-        <h4 data-en="Systems & Linux" data-ar="الأنظمة ولينكس">Systems & Linux</h4>
-        <p data-en="Linux environment configuration, shell scripting, hardware troubleshooting, kernel patching." data-ar="تهيئة بيئات لينكس، كتابة أسكريبتات الشل، فحص مشاكل العتاد، وتتبع أخطاء النظام.">Linux environment configuration, shell scripting, hardware troubleshooting, kernel patching.</p>
-      </div>
-      <div class="tech-card">
-        <h4 data-en="Core Languages" data-ar="لغات البرمجة">Core Languages</h4>
-        <p data-en="Python, Java, JavaScript (ES6+), SQL database structure & management." data-ar="بايثون، جافا، جافاسكربت، وبناء وإدارة قواعد البيانات SQL.">Python, Java, JavaScript (ES6+), SQL database structure & management.</p>
+
+      <div class="about-col">
+        <h4 data-en="Education" data-ar="التعليم">Education</h4>
+        <div class="entry">
+          <div class="e-role" id="e1r"></div>
+          <div class="e-org" id="e1o"></div>
+          <div class="e-date" id="e1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" id="e2r"></div>
+          <div class="e-org" id="e2o"></div>
+        </div>
+
+        <h4 style="margin-top:2.2rem;" data-en="Skills" data-ar="المهارات">Skills</h4>
+        <div class="tag-cloud" id="skillCloud"></div>
+
+        <h4 style="margin-top:2.2rem;" data-en="Languages" data-ar="اللغات">Languages</h4>
+        <div class="tag-cloud" id="langCloud"></div>
       </div>
     </div>
   </section>
@@ -386,27 +802,34 @@
   <section id="contact">
     <div class="section-head">
       <span class="num">03</span>
-      <h2 data-en="Get In Touch" data-ar="التواصل">Get In Touch</h2>
+      <h2 data-en="Contact" data-ar="تواصل">Contact</h2>
     </div>
-
-    <div class="terminal">
-      <div><span style="color:var(--pink)">yaaqob@dev</span>:~$ cat contact_info.txt</div>
-      <div>Email    : <a href="mailto:Yaaqobbasurra@gmail.com">Yaaqobbasurra@gmail.com</a></div>
-      <div>GitHub   : <a href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">github.com/yaaqobbasurra</a></div>
-      <div>LinkedIn : <a href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">linkedin.com/in/yaaqob-ba-surra</a></div>
-      <div>Location : Jeddah, Saudi Arabia</div>
+    <div class="terminal" id="terminalBox"></div>
+    <div class="social-row">
+      <a id="socMail" href="mailto:Yaaqobbasurra@gmail.com">Email</a>
+      <a id="socGh" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">GitHub</a>
+      <a id="socLi" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">LinkedIn</a>
     </div>
   </section>
 
 </main>
 
-<footer>✦ Yaaqob Ba Surra ✦</footer>
+<footer id="footNote">✦ Yaaqob Ba Surra ✦</footer>
 
 <script>
 (function(){
-  // Starfield Generation
+  const LI_URL = 'https://linkedin.com/in/yaaqob-ba-surra-00b6a5390';
+  const GH_URL = 'https://github.com/yaaqobbasurra';
+  const MAIL = 'mailto:Yaaqobbasurra@gmail.com';
+
+  document.getElementById('liLink').href = LI_URL;
+  document.getElementById('ghLink').href = GH_URL;
+  document.getElementById('socLi').href = LI_URL;
+  document.getElementById('socGh').href = GH_URL;
+  document.getElementById('socMail').href = MAIL;
+
   const starsWrap = document.getElementById('stars');
-  for(let i=0;i<65;i++){
+  for(let i=0;i<70;i++){
     const s = document.createElement('div');
     s.className='star';
     s.style.left = Math.random()*100+'%';
@@ -416,58 +839,186 @@
   }
 
   const EN = {
-    heroTagline: 'Software developer focused on web tools, custom UI solutions, and system-level troubleshooting. I build clean, efficient software for practical problems.',
-    rcpt: `
-      <div class="t">RECEIPT #0482</div>
-      <div class="r"><span>Item #1 (Hardware)</span><span>$40.00</span></div>
-      <div class="r"><span>Item #2 (Service)</span><span>$25.00</span></div>
-      <div class="r tot"><span>Total (Incl. VAT)</span><span>$65.00</span></div>
-      <small>Status: Saved to Browser Storage</small>
-    `
+    title:'Yaaqob Ba Surra',
+    nav:['Home','Work','About','Contact'],
+    heroKicker:'Computer Science · Jeddah, Saudi Arabia',
+    heroName:'Yaaqob Ba Surra',
+    heroTagline:'CS student who turns practical problems into usable web tools. I build interfaces, organize data workflows, and troubleshoot systems—from a quick POS recovery app to an application-review portal backed by Google Sheets.',
+    aboutIntro:'Computer Science diploma student at King Faisal University, graduating June 2027. Seeking a technology internship where I can contribute with JavaScript, web development, data organization, and practical troubleshooting.',
+    mail:'Yaaqobbasurra@gmail.com', gh:'GitHub', li:'LinkedIn', loc:'Jeddah, Saudi Arabia',
+
+    w1r:'Supervisor', w1o:'Vidas · Women\'s Fashion Exhibition', w1d:'Feb 2026 – Mar 2026',
+    w2r:'Content Documentation & Script Writing Associate', w2o:'DSA', w2d:'Dec 2025 – May 2026',
+    w3r:'Data Management & Database Development Associate', w3o:'DSA', w3d:'Dec 2025 – May 2026',
+
+    v1r:'Administrative Coordinator', v1o:'Majd Volunteering Team', v1d:'Dec 2025 – Mar 2026',
+    v2r:'Volunteer · International Volunteering Day', v2o:'Nabd Volunteering Association', v2d:'Dec 25 – 26, 2025',
+
+    e1r:'Diploma in Computer Science', e1o:'King Faisal University', e1d:'Aug 2025 – Jun 2027 (expected)',
+    e2r:'High School Diploma · Science', e2o:'Arafat General Secondary School',
+
+    skills:['JavaScript','HTML & CSS','Python','Java','Google Sheets','Web Application Development','Form & Review Workflows','Data Management','Linux','Hardware Troubleshooting','MS Office / Excel'],
+    langs:['Arabic — Native','English — Fluent'],
+
+    terminal:[
+      '<span class="prompt">guest@yaaqob</span>:~$ whoami',
+      'Yaaqob A.A Ba Surra — CS student, based in Jeddah',
+      '<span class="prompt">guest@yaaqob</span>:~$ cat contact.txt',
+      'email    : <a href="'+MAIL+'">Yaaqobbasurra@gmail.com</a>',
+      'github   : <a href="'+GH_URL+'" target="_blank" rel="noopener">github.com/yaaqobbasurra</a>',
+      'linkedin : <a href="'+LI_URL+'" target="_blank" rel="noopener">linkedin.com/in/yaaqob-ba-surra</a>',
+      'location : Jeddah, Saudi Arabia',
+      '<span class="prompt">guest@yaaqob</span>:~$ _'
+    ],
+    themeBtn:'🌙', themeBtnNight:'☀',
+    langBtn:'AR',
+    socMail:'Email', socGh:'GitHub', socLi:'LinkedIn',
+    foot:'✦ Yaaqob Ba Surra ✦'
   };
 
   const AR = {
-    heroTagline: 'مطور برمجيات مهتم بإنشاء أدوات الويب، حلول الواجهات المخصصة، وتشخيص أخطاء الأنظمة. أبني برمجيات نظيفة وفعالة لحل المشكلات العملية.',
-    rcpt: `
-      <div class="t">إيصال رقم #٠٤٨٢</div>
-      <div class="r"><span>منتج 1 (عتاد)</span><span>٤٠٫٠٠ ر.س</span></div>
-      <div class="r"><span>منتج 2 (خدمة)</span><span>٢٥٫٠٠ ر.س</span></div>
-      <div class="r tot"><span>الإجمالي (شامل الضريبة)</span><span>٦٥٫٠٠ ر.س</span></div>
-      <small>الحالة: تم الحفظ في التخزين المحلي</small>
-    `
+    title:'يعقوب باصرة',
+    nav:['الرئيسية','الأعمال','نبذة','تواصل'],
+    heroKicker:'علوم الحاسب · جدة، المملكة العربية السعودية',
+    heroName:'يعقوب باصرة',
+    heroTagline:'طالب علوم حاسب أحول المشكلات العملية إلى أدوات ويب قابلة للاستخدام. أبني واجهات وأنظم مسارات البيانات وأحل مشكلات الأنظمة — من تطبيق نقاط بيع سريع للطوارئ إلى بوابة مراجعة طلبات تعتمد على Google Sheets.',
+    aboutIntro:'طالب دبلوم علوم حاسب في جامعة الملك فيصل، متوقع تخرجي في يونيو 2027. أبحث عن تدريب تقني أستطيع فيه المساهمة بمهارات JavaScript وتطوير الويب وتنظيم البيانات وحل المشكلات العملية.',
+    mail:'Yaaqobbasurra@gmail.com', gh:'GitHub', li:'لينكدإن', loc:'جدة، المملكة العربية السعودية',
+
+    w1r:'مشرف', w1o:'معرض «فيداس» للأزياء النسائية', w1d:'فبراير 2026 – مارس 2026',
+    w2r:'مساعد توثيق وكتابة نصوص', w2o:'جمعية البيع المباشر', w2d:'ديسمبر 2025 – مايو 2026',
+    w3r:'مساعد إدارة البيانات وتطوير قواعد البيانات', w3o:'جمعية البيع المباشر', w3d:'ديسمبر 2025 – مايو 2026',
+
+    v1r:'منسق إداري', v1o:'فريق مجد التطوعي', v1d:'ديسمبر 2025 – مارس 2026',
+    v2r:'متطوع · اليوم العالمي للتطوع', v2o:'جمعية نبض التطوعية', v2d:'25 – 26 ديسمبر 2025',
+
+    e1r:'دبلوم علوم الحاسب', e1o:'جامعة الملك فيصل', e1d:'أغسطس 2025 – يونيو 2027 (متوقع)',
+    e2r:'الثانوية العامة · علمي', e2o:'مدرسة عرفات الثانوية العامة',
+
+    skills:['JavaScript','HTML & CSS','Python','Java','Google Sheets','تطوير تطبيقات الويب','مسارات النماذج والمراجعة','إدارة البيانات','Linux','حل مشكلات العتاد','MS Office / Excel'],
+    langs:['العربية — اللغة الأم','الإنجليزية — طلاقة'],
+
+    terminal:[
+      '<span class="prompt">زائر@يعقوب</span>:~$ من_أنا',
+      'يعقوب انور باصرة — طالب علوم حاسب، مقيم في جدة',
+      '<span class="prompt">زائر@يعقوب</span>:~$ عرض_جهات_الاتصال',
+      'البريد   : <a href="'+MAIL+'">Yaaqobbasurra@gmail.com</a>',
+      'GitHub   : <a href="'+GH_URL+'" target="_blank" rel="noopener">github.com/yaaqobbasurra</a>',
+      'لينكدإن  : <a href="'+LI_URL+'" target="_blank" rel="noopener">linkedin.com/in/yaaqob-ba-surra</a>',
+      'الموقع   : جدة، المملكة العربية السعودية',
+      '<span class="prompt">زائر@يعقوب</span>:~$ _'
+    ],
+    themeBtn:'🌙', themeBtnNight:'☀',
+    langBtn:'EN',
+    socMail:'البريد', socGh:'GitHub', socLi:'لينكدإن',
+    foot:'✦ يعقوب باصرة ✦'
   };
 
   let lang = 'en';
   let night = false;
 
+  function set(id, val){ const el = document.getElementById(id); if(el) el.textContent = val; }
+  function setHTML(id, val){ const el = document.getElementById(id); if(el) el.innerHTML = val; }
+  function cloud(id, items){ const el = document.getElementById(id); if(el) el.innerHTML = items.map(i=>`<span>${i}</span>`).join(''); }
+
   function render(){
-    const t = lang === 'en' ? EN : AR;
-    document.documentElement.classList.toggle('lang-ar', lang === 'ar');
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    const t = lang==='en' ? EN : AR;
+    document.title = t.title;
+    document.documentElement.classList.toggle('lang-ar', lang==='ar');
+    document.documentElement.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
 
-    document.getElementById('heroTagline').textContent = t.heroTagline;
-    document.getElementById('receiptBox').innerHTML = t.rcpt;
+    document.querySelectorAll('.nav-link').forEach((b,i)=> b.textContent = t.nav[i]);
 
-    document.querySelectorAll('[data-en]').forEach(el => {
-      el.textContent = el.getAttribute(lang === 'ar' ? 'data-ar' : 'data-en');
+    set('heroKicker', t.heroKicker);
+    set('heroName', t.heroName);
+    set('heroTagline', t.heroTagline);
+    set('mailLink', t.mail);
+    set('ghLink', t.gh);
+    set('liLink', t.li);
+    set('locLine', t.loc);
+    set('aboutIntro', t.aboutIntro);
+
+    set('w1r', t.w1r); set('w1o', t.w1o); set('w1d', t.w1d);
+    set('w2r', t.w2r); set('w2o', t.w2o); set('w2d', t.w2d);
+    set('w3r', t.w3r); set('w3o', t.w3o); set('w3d', t.w3d);
+
+    set('v1r', t.v1r); set('v1o', t.v1o); set('v1d', t.v1d);
+    set('v2r', t.v2r); set('v2o', t.v2o); set('v2d', t.v2d);
+
+    set('e1r', t.e1r); set('e1o', t.e1o); set('e1d', t.e1d);
+    set('e2r', t.e2r); set('e2o', t.e2o);
+
+    cloud('skillCloud', t.skills);
+    cloud('langCloud', t.langs);
+
+    setHTML('terminalBox',
+      t.terminal.map(l=>`<div>${l}${l.endsWith('_')?'<span class="cursor"></span>':''}</div>`).join('')
+    );
+
+    set('themeToggle', night ? t.themeBtnNight : t.themeBtn);
+    set('langToggle', t.langBtn);
+    set('socMail', t.socMail);
+    set('socGh', t.socGh);
+    set('socLi', t.socLi);
+    set('footNote', t.foot);
+
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      el.textContent = el.getAttribute(lang==='ar' ? 'data-ar' : 'data-en');
     });
-
-    document.getElementById('langToggle').textContent = lang === 'en' ? 'AR' : 'EN';
-    document.getElementById('themeToggle').textContent = night ? '☀' : '🌙';
   }
 
-  document.getElementById('themeToggle').addEventListener('click', () => {
+  function tvBurst(){
+    const b = document.getElementById('tvBurst');
+    b.classList.remove('go'); void b.offsetWidth; b.classList.add('go');
+  }
+
+  document.querySelectorAll('.nav-link').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-target');
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+
+  const sections = ['hero','work','about','contact'];
+  const navMap = {};
+  document.querySelectorAll('.nav-link').forEach(b=> navMap[b.getAttribute('data-target')] = b);
+
+  const spy = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.nav-link').forEach(b=> b.classList.remove('active'));
+        const btn = navMap[e.target.id];
+        if(btn) btn.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+  sections.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) spy.observe(el);
+  });
+
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
     night = !night;
     document.body.classList.toggle('night', night);
+    tvBurst();
     render();
   });
 
-  document.getElementById('langToggle').addEventListener('click', () => {
-    lang = lang === 'en' ? 'ar' : 'en';
+  document.getElementById('langToggle').addEventListener('click', ()=>{
+    lang = lang==='en' ? 'ar' : 'en';
+    tvBurst();
     render();
   });
 
   render();
+
+  function scheduleAmbient(){
+    const delay = 14000 + Math.random()*14000;
+    setTimeout(()=>{ tvBurst(); scheduleAmbient(); }, delay);
+  }
+  scheduleAmbient();
 })();
 </script>
 </body>
