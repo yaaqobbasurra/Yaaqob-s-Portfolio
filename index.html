@@ -3,649 +3,232 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YAAQOB.SYS</title>
+<title>Yaaqob Ba Surra</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --sky-a-day:#ffd7ec; --sky-b-day:#c9b6ff; --sky-c-day:#ffb199;
-    --sky-a-night:#040012; --sky-b-night:#2a0a4e; --sky-c-night:#7a2d64;
-    --pink:#ff2ea6; --cyan:#00d8e6; --purple:#8a5cff; --yellow:#ffd85e;
-    --ink:#171018; --paper:#f4efe6; --line:#171018;
-    --win-bg:#f4efe6; --win-text:#171018; --menubar-bg:#f4efe6;
-    --shadow: 6px 6px 0 rgba(0,0,0,0.55);
-    --grid-line: rgba(23,16,24,0.35);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    font-family:'Space Mono', monospace;
-    min-height:100vh;
-    overflow-x:hidden;
-    color:var(--win-text);
-    transition:color .4s ease;
-  }
-  html.lang-ar body{font-family:'Cairo', sans-serif;}
-  html.lang-ar .vt{font-family:'Cairo', sans-serif !important; font-weight:800; letter-spacing:0 !important;}
-
-  /* ============ SKY / BACKDROP ============ */
-  .sky{
-    position:fixed; inset:0; z-index:-3; overflow:hidden;
-    background:linear-gradient(180deg, var(--sky-a-day) 0%, var(--sky-b-day) 45%, var(--sky-c-day) 78%, var(--sky-c-day) 100%);
-    transition:background 1s ease;
-  }
-  body.night .sky{
-    background:linear-gradient(180deg, var(--sky-a-night) 0%, var(--sky-b-night) 55%, var(--sky-c-night) 100%);
-  }
-
-  .stars{position:absolute; inset:0; opacity:0; transition:opacity 1s ease;}
-  body.night .stars{opacity:1;}
-  .star{position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; animation:twinkle 3s ease-in-out infinite;}
-  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:1;}}
-
-  .sun-moon{
-    position:absolute; top:8%; left:50%; transform:translateX(-50%);
-    width:180px; height:180px; border-radius:50%;
-    background:repeating-linear-gradient(0deg, var(--pink) 0 8px, var(--yellow) 8px 16px);
-    box-shadow:0 0 0 3px var(--ink);
-    transition:background 1s ease, box-shadow 1s ease;
-  }
-  body.night .sun-moon{
-    background:radial-gradient(circle at 35% 35%, #f4f0ff 0%, #cfc7ea 55%, #9b93c2 100%);
-    box-shadow:0 0 40px rgba(200,190,255,.6), 0 0 0 3px var(--ink);
-  }
-
-  .cloud{position:absolute; border-radius:50%; filter:blur(0px); opacity:.9;
-    background:#fff; box-shadow: 40px 10px 0 -6px #fff, -40px 6px 0 -10px #fff, 0 18px 0 -2px #fff;
-    animation:drift linear infinite;
-  }
-  body.night .cloud{opacity:.15;}
-  @keyframes drift{ from{transform:translateX(-10vw);} to{transform:translateX(110vw);} }
-
-  .floor{
-    position:absolute; left:0; right:0; bottom:0; height:38%;
-    background-image:
-      linear-gradient(var(--grid-line) 2px, transparent 2px),
-      linear-gradient(90deg, var(--grid-line) 2px, transparent 2px);
-    background-size:60px 40px;
-    background-color: rgba(255,255,255,0.12);
-    transform:perspective(300px) rotateX(60deg);
-    transform-origin:bottom;
-    animation:floorMove 6s linear infinite;
-  }
-  @keyframes floorMove{ from{background-position:0 0, 0 0;} to{background-position:0 40px, 60px 0;} }
-
-  .bust{
-    position:absolute; bottom:0; opacity:.9; pointer-events:none;
-  }
-
-  /* ============ CRT / SCANLINES ============ */
-  .crt{
-    position:fixed; inset:0; z-index:50; pointer-events:none;
-    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px);
-    mix-blend-mode:multiply;
-  }
-  .flicker{position:fixed; inset:0; z-index:60; pointer-events:none; background:#fff; opacity:0;}
-  .flicker.go{animation:flickerAnim .35s steps(2,end);}
-  @keyframes flickerAnim{ 0%{opacity:.9;} 40%{opacity:0;} 60%{opacity:.5;} 100%{opacity:0;} }
-
-  /* ============ GLITCH TEXT ============ */
-  .glitch{position:relative; display:inline-block;}
-  .glitch::before, .glitch::after{
-    content:attr(data-text); position:absolute; left:0; top:0; width:100%; height:100%;
-    overflow:hidden; background:transparent;
-  }
-  .glitch::before{
-    color:var(--yellow); left:2px; clip-path:inset(0 0 65% 0);
-    animation:glitchTop 3.4s infinite linear alternate-reverse;
-  }
-  .glitch::after{
-    color:var(--purple); left:-2px; clip-path:inset(65% 0 0 0);
-    animation:glitchBottom 2.6s infinite linear alternate-reverse;
-  }
-  @keyframes glitchTop{
-    0%,100%{transform:translate(0,0);} 20%{transform:translate(-2px,-1px);} 40%{transform:translate(2px,1px);}
-    60%{transform:translate(-1px,1px);} 80%{transform:translate(1px,-1px);}
-  }
-  @keyframes glitchBottom{
-    0%,100%{transform:translate(0,0);} 25%{transform:translate(2px,1px);} 50%{transform:translate(-2px,-1px);}
-    75%{transform:translate(1px,-2px);}
-  }
-
-  /* ============ MENU BAR ============ */
-  .menubar{
-    position:fixed; top:0; left:0; right:0; z-index:40;
-    display:flex; align-items:center; justify-content:space-between; gap:1rem;
-    background:var(--menubar-bg); border-bottom:2px solid var(--ink);
-    padding:.6rem 1rem; flex-wrap:wrap;
-    transition:background .4s ease;
-  }
-  body.night .menubar{ --menubar-bg:#171022; color:#f4efe6; border-bottom-color:#f4efe6; }
-  .brand{font-family:'VT323', monospace; font-size:1.4rem; letter-spacing:2px;}
-  .menu-links{display:flex; gap:.3rem; flex-wrap:wrap;}
-  .menu-link{
-    font-family:'VT323', monospace; font-size:1rem; letter-spacing:1px;
-    background:transparent; border:1px solid transparent; color:inherit;
-    padding:.25rem .7rem; cursor:pointer; text-transform:uppercase;
-  }
-  html.lang-ar .menu-link{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700;}
-  .menu-link:hover{border-color:currentColor;}
-  .menu-link.active{background:var(--ink); color:var(--paper);}
-  body.night .menu-link.active{background:#f4efe6; color:#171022;}
-  .menu-toggles{display:flex; gap:.4rem;}
-  .menu-toggles button{
-    font-family:'VT323', monospace; font-size:1rem;
-    border:1px solid currentColor; background:transparent; color:inherit;
-    padding:.25rem .6rem; cursor:pointer;
-  }
-  .menu-toggles button:hover{background:currentColor; color:var(--menubar-bg);}
-
-  /* ============ STAGE / WINDOWS ============ */
-  .stage{ position:relative; z-index:2; padding:5.5rem 1.2rem 3rem; min-height:100vh; display:flex; align-items:flex-start; justify-content:center;}
-  .page{ display:none; width:100%; max-width:900px; margin:0 auto; animation:pageIn .4s ease; }
-  .page.active{ display:block; }
-  @keyframes pageIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
-  .window{
-    background:var(--win-bg); border:2px solid var(--ink); box-shadow:var(--shadow);
-    color:var(--win-text);
-  }
-  body.night .window{ --win-bg:#1c1626; --win-text:#f4efe6; box-shadow:6px 6px 0 rgba(0,0,0,.7); }
-  .titlebar{
-    display:flex; align-items:center; gap:.5rem;
-    border-bottom:2px solid var(--ink); padding:.4rem .6rem;
-    background:repeating-linear-gradient(180deg, var(--ink) 0 2px, transparent 2px 4px);
-  }
-  body.night .titlebar{ background:repeating-linear-gradient(180deg, #f4efe6 0 2px, transparent 2px 4px); border-bottom-color:#f4efe6; }
-  .titlebar .dot{ width:11px; height:11px; border:1.5px solid var(--ink); background:var(--win-bg); flex-shrink:0; }
-  body.night .titlebar .dot{ border-color:#f4efe6; background:#1c1626; }
-  .wtitle{ font-family:'VT323', monospace; font-size:1rem; background:var(--win-bg); padding:0 .6rem; }
-  body.night .wtitle{ background:#1c1626; }
-  html.lang-ar .wtitle{font-family:'Cairo',sans-serif; font-weight:700; font-size:.8rem;}
-  .wbody{ padding:1.8rem 1.6rem 2.2rem; }
-
-  h1.glitch{ font-family:'VT323', monospace; font-size:3.4rem; letter-spacing:2px; line-height:1; }
-  h2.glitch{ font-family:'VT323', monospace; font-size:1.8rem; letter-spacing:2px; border-bottom:2px solid var(--ink); padding-bottom:.4rem; margin-bottom:1.3rem; }
-  body.night h2.glitch{ border-bottom-color:#f4efe6; }
-  .role{ font-size:.95rem; letter-spacing:1px; color:var(--purple); margin:.5rem 0 1rem; text-transform:uppercase; }
-  .summary{ font-size:.95rem; line-height:1.8; max-width:60ch; margin-bottom:1.6rem; }
-
-  .contact-row{ display:flex; gap:1rem; flex-wrap:wrap; font-size:.85rem; margin-bottom:1.8rem; }
-  .contact-row a, .contact-row span{ color:inherit; text-decoration:none; border-bottom:1px dashed currentColor; }
-  .contact-row a:hover{ color:var(--pink); }
-
-  .cta-row{ display:flex; gap:.7rem; flex-wrap:wrap; }
-  .cta-row button{
-    font-family:'VT323', monospace; font-size:1rem; letter-spacing:1px;
-    border:2px solid var(--ink); background:var(--win-bg); color:var(--win-text);
-    padding:.5rem 1.1rem; cursor:pointer; text-transform:uppercase;
-  }
-  body.night .cta-row button{ border-color:#f4efe6; }
-  .cta-row button:hover{ background:var(--ink); color:var(--win-bg); }
-  body.night .cta-row button:hover{ background:#f4efe6; color:#1c1626; }
-  html.lang-ar .cta-row button{font-family:'Cairo',sans-serif; font-weight:700; font-size:.8rem;}
-
-  /* ============ CARDS ============ */
-  .card{ border:2px solid var(--ink); padding:1rem 1.2rem; margin-bottom:1.1rem; background:rgba(0,0,0,0.02); }
-  body.night .card{ border-color:#f4efe6; background:rgba(255,255,255,0.03); }
-  .card:last-child{ margin-bottom:0; }
-  .card .ctitle{ font-family:'VT323', monospace; font-size:1.3rem; }
-  html.lang-ar .card .ctitle{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.05rem;}
-  .card .corg{ color:var(--pink); font-size:.85rem; margin-bottom:.15rem; }
-  .card .cdate{ font-size:.7rem; letter-spacing:1px; color:var(--cyan); margin-bottom:.6rem; text-transform:uppercase; }
-  .card ul{ padding-inline-start:1.2rem; font-size:.85rem; line-height:1.7; }
-
-  .tag{
-    display:inline-block; border:1.5px solid var(--ink); padding:.25rem .8rem;
-    font-size:.75rem; margin:0 .4rem .4rem 0; background:transparent;
-  }
-  body.night .tag{ border-color:#f4efe6; }
-  html.lang-ar .tag{ margin:0 0 .4rem .4rem; }
-
-  /* ============ SKILL BELTS ============ */
-  .belt-row{ margin-bottom:1.4rem; }
-  .belt-label{ font-family:'VT323', monospace; font-size:1rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:.4rem; color:var(--purple); }
-  html.lang-ar .belt-label{font-family:'Cairo',sans-serif; font-weight:700;}
-  .belt-wrap{ overflow:hidden; border:2px solid var(--ink); padding:.6rem 0; }
-  body.night .belt-wrap{ border-color:#f4efe6; }
-  .belt-track{ display:flex; gap:1.6rem; width:max-content; animation:beltMove 30s linear infinite; padding:0 1rem;}
-  html.lang-ar .belt-track{ animation-direction:reverse; }
-  .belt-track:hover{ animation-play-state:paused; }
-  @keyframes beltMove{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  .belt-item{ white-space:nowrap; font-size:.8rem; border:1px solid currentColor; padding:.3rem .9rem; }
-
-  /* ============ TERMINAL (CONTACT) ============ */
-  .terminal{ font-family:'VT323', monospace; font-size:1.15rem; line-height:1.9; }
-  html.lang-ar .terminal{font-family:'Cairo',sans-serif; font-size:.95rem;}
-  .terminal .prompt{ color:var(--pink); }
-  .cursor{ display:inline-block; width:9px; height:1.1em; background:currentColor; animation:blink 1s steps(1) infinite; vertical-align:middle; margin-inline-start:4px; }
-  @keyframes blink{ 50%{opacity:0;} }
-
-  footer.foot{ text-align:center; font-size:.65rem; letter-spacing:2px; opacity:.5; padding:1.5rem; color:var(--win-text); position:relative; z-index:2; }
-
-  @media (max-width:640px){
-    h1.glitch{ font-size:2.1rem; }
-    .menu-links{ order:3; width:100%; justify-content:center; }
-    .wbody{ padding:1.2rem 1rem 1.6rem; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="sky">
   <div class="stars" id="stars"></div>
-  <div class="sun-moon"></div>
-  <div class="cloud" style="width:120px;height:40px; top:12%; left:8%; animation-duration:38s;"></div>
-  <div class="cloud" style="width:160px;height:50px; top:22%; left:60%; animation-duration:52s; animation-delay:-10s;"></div>
-  <div class="cloud" style="width:100px;height:34px; top:33%; left:35%; animation-duration:44s; animation-delay:-22s;"></div>
+  <div class="sun"></div>
+  <div class="cloud" style="width:140px;height:44px; top:12%; left:8%; animation-duration:42s;"></div>
+  <div class="cloud" style="width:180px;height:52px; top:24%; left:60%; animation-duration:56s; animation-delay:-12s;"></div>
+  <div class="cloud" style="width:110px;height:36px; top:34%; left:35%; animation-duration:48s; animation-delay:-24s;"></div>
   <div class="floor"></div>
 </div>
-<div class="crt"></div>
-<div class="flicker" id="flicker"></div>
 
-<nav class="menubar">
-  <div class="brand glitch" data-text="YAAQOB.SYS">YAAQOB.SYS</div>
-  <div class="menu-links" id="menuLinks">
-    <button class="menu-link active" data-page="home">Home</button>
-    <button class="menu-link" data-page="experience">Work</button>
-    <button class="menu-link" data-page="volunteer">Volunteer</button>
-    <button class="menu-link" data-page="skills">Skills</button>
-    <button class="menu-link" data-page="education">Education</button>
-    <button class="menu-link" data-page="contact">Contact</button>
+<div class="hero-palm" aria-hidden="true">
+  <svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
+    <g class="trunk">
+      <path class="trunk-fill" d="M142 520 C138 460, 130 400, 138 340 C146 285, 152 240, 158 190 C160 175, 168 165, 182 160 L188 168 C176 174, 170 184, 168 196 C162 240, 156 288, 148 342 C142 400, 150 462, 154 520 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M132 470 L158 470 L158 476 L132 476 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M130 420 L160 420 L160 426 L130 426 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M132 370 L163 370 L163 376 L132 376 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M138 320 L167 320 L167 326 L138 326 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M146 270 L170 270 L170 276 L146 276 Z"/>
+      <path class="trunk-fill" opacity=".35" d="M154 220 L178 220 L178 226 L154 226 Z"/>
+    </g>
+    <g class="crown">
+      <circle class="trunk-fill" cx="166" cy="168" r="6"/>
+      <circle class="trunk-fill" cx="180" cy="170" r="6"/>
+      <circle class="trunk-fill" cx="174" cy="180" r="5"/>
+      <path class="frond-a" d="M182 160 C120 130, 50 130, 10 168 C50 152, 110 152, 178 168 Z"/>
+      <path class="frond-b" d="M180 162 C110 152, 40 176, 18 220 C60 190, 120 180, 176 176 Z"/>
+      <path class="frond-c" d="M182 160 C130 172, 80 210, 70 258 C100 220, 150 190, 180 176 Z"/>
+      <path class="frond-a" d="M186 158 C250 128, 320 128, 360 166 C320 150, 260 150, 190 166 Z"/>
+      <path class="frond-b" d="M188 160 C256 150, 324 176, 346 218 C304 188, 244 178, 190 174 Z"/>
+      <path class="frond-c" d="M186 160 C240 172, 288 210, 298 256 C268 218, 220 190, 190 176 Z"/>
+      <path class="frond-b" d="M184 158 C172 110, 172 60, 194 30 C196 70, 192 120, 186 158 Z"/>
+      <path class="frond-c" d="M184 158 C200 118, 228 84, 260 80 C240 110, 210 138, 186 158 Z"/>
+      <path class="frond-c" d="M182 160 C168 122, 140 92, 108 92 C130 118, 158 142, 182 160 Z"/>
+      <path class="frond-c" d="M182 162 C150 196, 140 240, 150 292 C168 246, 178 204, 184 168 Z"/>
+    </g>
+  </svg>
+</div>
+
+<div class="crt"></div>
+<div class="roll-band"></div>
+<div class="tv-burst" id="tvBurst"></div>
+
+<nav class="nav">
+  <div class="brand">YAAQOB.SYS</div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link active" data-target="hero" data-i18n="nav.0">Home</button>
+    <button class="nav-link" data-target="work" data-i18n="nav.1">Work</button>
+    <button class="nav-link" data-target="about" data-i18n="nav.2">About</button>
+    <button class="nav-link" data-target="contact" data-i18n="nav.3">Contact</button>
   </div>
-  <div class="menu-toggles">
-    <button id="themeToggle">🌙 NIGHT</button>
-    <button id="langToggle">AR / عربي</button>
+  <div class="nav-right">
+    <button id="themeToggle">🌙</button>
+    <button id="langToggle">AR</button>
   </div>
 </nav>
 
-<main class="stage">
+<main>
 
-  <!-- HOME -->
-  <section class="page active" id="page-home">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tHome">yaaqob.app — home</span></div>
-      <div class="wbody">
-        <h1 class="glitch" id="heroName" data-text="YAAQOB BA SURRA">YAAQOB BA SURRA</h1>
-        <div class="role" id="heroRole">computer science · IT & development · content</div>
-        <p class="summary" id="heroSummary"></p>
-        <div class="contact-row">
-          <a id="mailBtn" href="mailto:Yaaqobbasurra@gmail.com">✉ Yaaqobbasurra@gmail.com</a>
-          <a id="liBtn" href="#" target="_blank" rel="noopener">in/ Yaaqob Ba surra</a>
-          <span id="locTxt">📍 Jeddah</span>
+  <section id="hero">
+    <div class="kicker" data-i18n="hero.kicker">Computer Science · Jeddah</div>
+    <h1 data-i18n="hero.name">Yaaqob Ba Surra</h1>
+    <p class="tagline" data-i18n="hero.tagline"></p>
+    <div class="contact-line">
+      <a id="mailLink" href="mailto:Yaaqobbasurra@gmail.com" data-i18n="hero.mail"></a>
+      <a id="ghLink" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-i18n="hero.gh"></a>
+      <a id="liLink" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener" data-i18n="hero.li"></a>
+      <span data-i18n="hero.loc"></span>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2 data-i18n="work.title">Selected work</h2>
+    </div>
+
+    <article class="project">
+      <div class="p-text">
+        <h3 data-i18n="projects.app.title"></h3>
+        <div class="p-meta" data-i18n="projects.app.meta"></div>
+        <p data-i18n="projects.app.p1"></p>
+        <p data-i18n="projects.app.p2"></p>
+        <div class="p-tags" data-i18n-tags="projects.app.tags"></div>
+      </div>
+      <div class="p-vis">
+        <div class="appflow" aria-hidden="true">
+          <div class="appbar"><i></i><i></i><i></i><span>REVIEW PANEL</span></div>
+          <div class="app-title">APPLICATION DETAILS</div>
+          <div class="app-row"><span class="label">Applicant</span><span class="value">New submission</span></div>
+          <div class="app-row"><span class="label">Source</span><span class="value">Google Sheets</span></div>
+          <div class="app-row"><span class="label">Status</span><span class="status">Pending review</span></div>
+          <div class="app-actions"><span>ACCEPT</span><span>DECLINE</span></div>
         </div>
-        <div class="cta-row" id="ctaRow">
-          <button data-page="experience" id="ctaWork">Work →</button>
-          <button data-page="volunteer" id="ctaVol">Volunteer →</button>
-          <button data-page="skills" id="ctaSkills">Skills →</button>
-          <button data-page="education" id="ctaEdu">Education →</button>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="p-text">
+        <h3 data-i18n="projects.receipt.title"></h3>
+        <div class="p-meta" data-i18n="projects.receipt.meta"></div>
+        <p data-i18n="projects.receipt.p1"></p>
+        <p data-i18n="projects.receipt.p2"></p>
+        <p data-i18n="projects.receipt.p3"></p>
+        <div class="p-tags" data-i18n-tags="projects.receipt.tags"></div>
+      </div>
+      <div class="p-vis">
+        <div class="prcpt">
+          <div class="t">إيصال بيع</div>
+          <div class="r"><span>منتج ١</span><span>٤٠٫٠٠</span></div>
+          <div class="r"><span>منتج ٢</span><span>٢٥٫٠٠</span></div>
+          <div class="r tot"><span>الإجمالي</span><span>٦٥٫٠٠</span></div>
+          <small>sample · receipt-maker.exe</small>
         </div>
+      </div>
+    </article>
+
+    <article class="project">
+      <div class="p-text">
+        <h3 data-i18n="projects.ps4.title"></h3>
+        <div class="p-meta" data-i18n="projects.ps4.meta"></div>
+        <p data-i18n="projects.ps4.p1"></p>
+        <p data-i18n="projects.ps4.p2"></p>
+        <p data-i18n="projects.ps4.p3"></p>
+        <div class="p-tags" data-i18n-tags="projects.ps4.tags"></div>
+      </div>
+      <div class="p-vis">
+        <div class="pterm">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load kernel</span>
+          <span class="l">&nbsp;&nbsp;checking bzImage... <span class="r">?</span></span>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load initramfs</span>
+          <span class="l">&nbsp;&nbsp;checking initramfs... <span class="r">?</span></span>
+          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ do they match?</span>
+          <span class="l">&nbsp;&nbsp;scanning... <span class="r">..</span></span>
+          <span class="l">&nbsp;&nbsp;scanning... <span class="r">.....</span></span>
+          <span class="l g">&nbsp;&nbsp;yes. finally. booting.</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section id="about">
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2 data-i18n="about.title">Background</h2>
+    </div>
+
+    <p class="about-intro" data-i18n="about.intro"></p>
+
+    <div class="about-grid">
+      <div class="about-col">
+        <h4 data-i18n="about.expTitle">Experience</h4>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.w1r"></div>
+          <div class="e-org" data-i18n="about.w1o"></div>
+          <div class="e-date" data-i18n="about.w1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.w2r"></div>
+          <div class="e-org" data-i18n="about.w2o"></div>
+          <div class="e-date" data-i18n="about.w2d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.w3r"></div>
+          <div class="e-org" data-i18n="about.w3o"></div>
+          <div class="e-date" data-i18n="about.w3d"></div>
+        </div>
+
+        <h4 class="col-gap" data-i18n="about.volTitle">Volunteering</h4>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.v1r"></div>
+          <div class="e-org" data-i18n="about.v1o"></div>
+          <div class="e-date" data-i18n="about.v1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.v2r"></div>
+          <div class="e-org" data-i18n="about.v2o"></div>
+          <div class="e-date" data-i18n="about.v2d"></div>
+        </div>
+      </div>
+
+      <div class="about-col">
+        <h4 data-i18n="about.eduTitle">Education</h4>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.e1r"></div>
+          <div class="e-org" data-i18n="about.e1o"></div>
+          <div class="e-date" data-i18n="about.e1d"></div>
+        </div>
+        <div class="entry">
+          <div class="e-role" data-i18n="about.e2r"></div>
+          <div class="e-org" data-i18n="about.e2o"></div>
+        </div>
+
+        <h4 class="col-gap" data-i18n="about.skillsTitle">Skills</h4>
+        <div class="tag-cloud" data-i18n-tags="about.skills"></div>
+
+        <h4 class="col-gap" data-i18n="about.langTitle">Languages</h4>
+        <div class="tag-cloud" data-i18n-tags="about.langs"></div>
       </div>
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
-  <section class="page" id="page-experience">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tExp">yaaqob.app — work</span></div>
-      <div class="wbody">
-        <h2 class="glitch" id="expTitle" data-text="WORK EXPERIENCE">WORK EXPERIENCE</h2>
-        <div class="card">
-          <div class="ctitle" id="exp1Title">Supervisor</div>
-          <div class="corg" id="exp1Org">Vidas · Women's Fashion Exhibition</div>
-          <div class="cdate" id="exp1Date">Feb 2026 – Mar 2026</div>
-          <ul id="exp1List"></ul>
-        </div>
-        <div class="card">
-          <div class="ctitle" id="exp2Title">Content Documentation & Script Writing Associate</div>
-          <div class="corg" id="exp2Org">DSA</div>
-          <div class="cdate" id="exp2Date">Dec 2025 – May 2026</div>
-          <ul id="exp2List"></ul>
-        </div>
-        <div class="card">
-          <div class="ctitle" id="exp3Title">Data Management & Database Development Associate</div>
-          <div class="corg" id="exp3Org">DSA</div>
-          <div class="cdate" id="exp3Date">Dec 2025 – May 2026</div>
-          <ul id="exp3List"></ul>
-        </div>
-        <div class="card">
-          <div class="ctitle" id="exp4Title">Personal Projects · Tech & Development</div>
-          <div class="corg" id="exp4Org">Independent</div>
-          <div class="cdate" id="exp4Date">2024 – Present</div>
-          <ul id="exp4List"></ul>
-        </div>
-      </div>
+  <section id="contact">
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2 data-i18n="contact.title">Contact</h2>
     </div>
-  </section>
-
-  <!-- VOLUNTEER -->
-  <section class="page" id="page-volunteer">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tVol">yaaqob.app — volunteer</span></div>
-      <div class="wbody">
-        <h2 class="glitch" id="volTitle" data-text="VOLUNTEERING">VOLUNTEERING</h2>
-        <div class="card">
-          <div class="ctitle" id="vol1Title">Administrative Coordinator</div>
-          <div class="corg" id="vol1Org">Majd Volunteering Team</div>
-          <div class="cdate" id="vol1Date">Dec 2025 – Mar 2026</div>
-          <ul id="vol1List"></ul>
-        </div>
-        <div class="card">
-          <div class="ctitle" id="vol2Title">Volunteer · International Volunteering Day</div>
-          <div class="corg" id="vol2Org">Nabd Volunteering Association</div>
-          <div class="cdate" id="vol2Date">Dec 25 – 26, 2025</div>
-          <ul id="vol2List"></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section class="page" id="page-skills">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tSkills">yaaqob.app — skills</span></div>
-      <div class="wbody">
-        <h2 class="glitch" id="skillsTitle" data-text="SKILLS">SKILLS</h2>
-        <div class="belt-row">
-          <div class="belt-label" id="techLabel">▸ Technical & Analytical</div>
-          <div class="belt-wrap"><div class="belt-track" id="techBelt"></div></div>
-        </div>
-        <div class="belt-row">
-          <div class="belt-label" id="leadLabel">▸ Leadership & Interpersonal</div>
-          <div class="belt-wrap"><div class="belt-track" id="leadBelt"></div></div>
-        </div>
-        <div class="belt-row">
-          <div class="belt-label" id="langSkillLabel">▸ Languages & Tools</div>
-          <div class="belt-wrap"><div class="belt-track" id="langBelt"></div></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EDUCATION -->
-  <section class="page" id="page-education">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tEdu">yaaqob.app — education</span></div>
-      <div class="wbody">
-        <h2 class="glitch" id="eduTitle" data-text="EDUCATION & CERTIFICATIONS">EDUCATION & CERTIFICATIONS</h2>
-        <div class="card">
-          <div class="ctitle" id="edu1">Diploma in Computer Science</div>
-          <div class="corg" id="edu1Org">King Faisal University</div>
-          <div class="cdate" id="edu1Date">August 2025 – Present (graduating June 2027)</div>
-        </div>
-        <div class="card">
-          <div class="ctitle" id="edu2">High School Diploma · Science</div>
-          <div class="corg" id="edu2Org">Arafat General Secondary School</div>
-        </div>
-        <div class="belt-label" style="margin-top:1.4rem;" id="certLabel">▸ Certifications</div>
-        <div id="certTags" style="margin:.6rem 0 1.4rem;"></div>
-        <div class="belt-label" id="langLabel">▸ Languages</div>
-        <div id="langTags" style="margin-top:.6rem;"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="page" id="page-contact">
-    <div class="window">
-      <div class="titlebar"><span class="dot"></span><span class="wtitle" id="tContact">yaaqob.app — contact</span></div>
-      <div class="wbody">
-        <h2 class="glitch" id="contactTitle" data-text="CONTACT">CONTACT</h2>
-        <div class="terminal" id="terminalBox"></div>
-      </div>
+    <div class="terminal" id="terminalBox"></div>
+    <div class="social-row">
+      <a href="mailto:Yaaqobbasurra@gmail.com" data-i18n="contact.socMail"></a>
+      <a href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-i18n="contact.socGh"></a>
+      <a href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener" data-i18n="contact.socLi"></a>
     </div>
   </section>
 
 </main>
 
-<footer class="foot" id="footNote">✦ Yaaqob Ba surra · yaaqobbasurra@gmail.com ✦</footer>
+<footer id="footNote" data-i18n="foot"></footer>
 
-<script>
-(function(){
-  document.getElementById('liBtn').href = 'https://linkedin.com/in/yaaqob-ba-surra-00b6a5390';
-
-  // stars
-  const starsWrap = document.getElementById('stars');
-  for(let i=0;i<60;i++){
-    const s = document.createElement('div');
-    s.className='star';
-    s.style.left = Math.random()*100+'%';
-    s.style.top = Math.random()*70+'%';
-    s.style.animationDelay = (Math.random()*3)+'s';
-    starsWrap.appendChild(s);
-  }
-
-  const EN = {
-    title:'YAAQOB.SYS',
-    nav:['Home','Work','Volunteer','Skills','Education','Contact'],
-    tHome:'yaaqob.app — home', tExp:'yaaqob.app — work', tVol:'yaaqob.app — volunteer',
-    tSkills:'yaaqob.app — skills', tEdu:'yaaqob.app — education', tContact:'yaaqob.app — contact',
-    heroName:'YAAQOB BA SURRA',
-    heroRole:'computer science student · IT & development · documentation · script writing',
-    heroSummary:'Computer Science diploma student (graduating June 2027) with practical experience in retail operations, database work, and personal tech projects. Built an Arabic point-of-sale web app in vanilla JavaScript and installed Linux on a PlayStation 4. Also experienced in documentation, script writing, and educational content creation. Looking for an internship or entry-level role in IT, web development, or tech support.',
-    mail:'✉ Yaaqobbasurra@gmail.com', li:'in/ Yaaqob Ba surra', loc:'📍 Jeddah',
-    ctaWork:'Work →', ctaVol:'Volunteer →', ctaSkills:'Skills →', ctaEdu:'Education →',
-    expTitle:'WORK EXPERIENCE',
-    exp1Title:'Supervisor', exp1Org:'Vidas · Women\'s Fashion Exhibition', exp1Date:'Feb 2026 – Mar 2026',
-    exp1List:['Supervised a team of 6 workers.','Handled daily inventory restocking and tracked staff attendance.','Tracked daily sales and kept financial records accurate across a 25-day period.'],
-    exp2Title:'Content Documentation & Script Writing Associate', exp2Org:'DSA', exp2Date:'Dec 2025 – May 2026',
-    exp2List:['Reviewing and documenting internal files for accuracy.','Writing scripts for educational content and products.'],
-    exp3Title:'Data Management & Database Development Associate', exp3Org:'DSA', exp3Date:'Dec 2025 – May 2026',
-    exp3List:['Designing a database for scalable network expansion.','Researching and fact-checking data.'],
-    exp4Title:'Personal Projects · Tech & Development', exp4Org:'Independent', exp4Date:'2024 – Present',
-    exp4List:['Linux on PlayStation 4 (CachyOS): Installed Arch-based Linux on a PS4, working around locked boot process; handled storage, display, and driver configuration.','Invoice & Receipt Generator: Arabic RTL point-of-sale web app built from scratch with vanilla JavaScript — multi-user login, sequential invoice numbers, VAT-inclusive pricing, local storage, print-ready output, and live receipt preview.'],
-    volTitle:'VOLUNTEERING',
-    vol1Title:'Administrative Coordinator', vol1Org:'Majd Volunteering Team', vol1Date:'Dec 2025 – Mar 2026',
-    vol1List:['Organizing the team\'s operations and ensuring adherence to professional conduct and public etiquette.','Monitoring workflow continuity and resolving emerging operational issues.'],
-    vol2Title:'Volunteer · International Volunteering Day', vol2Org:'Nabd Volunteering Association', vol2Date:'Dec 25 – 26, 2025',
-    vol2List:['Introducing visitors to the idea and importance of volunteering.','Guest relations management and providing hospitality services.','Promoting the volunteering culture and community engagement to the world.'],
-    skillsTitle:'SKILLS', techLabel:'▸ Technical & Analytical', leadLabel:'▸ Leadership & Interpersonal', langSkillLabel:'▸ Languages & Tools',
-    tech:['Scientific Research & Data Collection','Data Auditing & Analysis','Content Writing & Copywriting','Database Management','Computer Literacy (MS Office/Excel)','Python','Java','JavaScript','HTML & CSS','JSON','Linux','Hardware Troubleshooting','POS Web App Development'],
-    lead:['Effective Communication','Group Management & Leadership','Relationship Building & Networking','Adaptability & Crisis Management','Ideation & Brainstorming','Team Supervision'],
-    langSkills:['Arabic — Native','English — Fluent','Python','Java','JavaScript','HTML/CSS','Linux','CachyOS','MS Office','Data Analysis'],
-    eduTitle:'EDUCATION & CERTIFICATIONS',
-    edu1:'Diploma in Computer Science', edu1Org:'King Faisal University', edu1Date:'August 2025 – Present (graduating June 2027)',
-    edu2:'High School Diploma · Science', edu2Org:'Arafat General Secondary School',
-    certLabel:'▸ Certifications',
-    certs:['Executive Secretarial & Office Management','Human Resources Management','Cybersecurity Essentials','Training of Trainers','Workplace Excellence & Professional Skills','Computer Skills','Emaar H.T.I'],
-    langLabel:'▸ Languages', langs:['Arabic — Native','English — Fluent'],
-    contactTitle:'CONTACT',
-    terminal:[
-      '<span class="prompt">guest@yaaqob</span>:~$ whoami',
-      'Yaaqob A.A Ba surra — Computer Science student, based in Jeddah',
-      '<span class="prompt">guest@yaaqob</span>:~$ cat contact.txt',
-      'email    : Yaaqobbasurra@gmail.com',
-      'linkedin : Yaaqob Ba surra',
-      'location : Jeddah, Saudi Arabia',
-      '<span class="prompt">guest@yaaqob</span>:~$ _'
-    ],
-    themeBtn:['🌙 NIGHT','☀ DAY'], langBtn:'AR / عربي',
-    foot:'✦ Yaaqob Ba surra · yaaqobbasurra@gmail.com ✦'
-  };
-
-  const AR = {
-    title:'يعقوب.نظام',
-    nav:['الرئيسية','الخبرة','التطوع','المهارات','التعليم','تواصل'],
-    tHome:'الرئيسية', tExp:'الخبرة المهنية', tVol:'التطوع',
-    tSkills:'المهارات', tEdu:'التعليم', tContact:'تواصل',
-    heroName:'يعقوب باصرة',
-    heroRole:'طالب علوم حاسب · تقنية وتطوير · توثيق · كتابة نصوص',
-    heroSummary:'أنا طالب دبلوم علوم حاسب (خريج 2027) ولديّ خبرة عملية في عمليات البيع بالتجزئة، والعمل على قواعد البيانات، والمشاريع التقنية الشخصية. قمت ببناء تطبيق نقطة بيع عربي بلغة جافاسكربت الأصلية، وتثبيت لينكس على بلايستيشن 4. كما أمتلك خبرة في التوثيق وكتابة النصوص (السيناريو) وصناعة المحتوى التعليمي. أبحث عن تدريب أو وظيفة مبتدئة في تقنية المعلومات، تطوير الويب، أو الدعم الفني.',
-    mail:'✉ Yaaqobbasurra@gmail.com', li:'لينكدإن: يعقوب باصرة', loc:'📍 جدة',
-    ctaWork:'← الخبرة', ctaVol:'← التطوع', ctaSkills:'← المهارات', ctaEdu:'← التعليم',
-    expTitle:'الخبرة المهنية',
-    exp1Title:'مشرف', exp1Org:'معرض «فيداس» للأزياء النسائية', exp1Date:'فبراير 2026 – مارس 2026',
-    exp1List:['الإشراف على فريق مكوّن من 6 موظفين.','إدارة المخزون اليومي ومتابعة حضور وانضباط الموظفين.','متابعة المبيعات اليومية وحفظ السجلات المالية بدقة على مدار 25 يوماً.'],
-    exp2Title:'مساعد توثيق وكتابة نصوص', exp2Org:'جمعية البيع المباشر', exp2Date:'ديسمبر 2025 – مايو 2026',
-    exp2List:['مراجعة الملفات الداخلية وتوثيقها لضمان الدقة الإدارية.','كتابة النصوص (السيناريو) للمحتوى والمنتجات التعليمية.'],
-    exp3Title:'مساعد إدارة البيانات وتطوير قواعد البيانات', exp3Org:'جمعية البيع المباشر', exp3Date:'ديسمبر 2025 – مايو 2026',
-    exp3List:['تصميم قواعد بيانات بما يضمن مرونة وتوسع الشبكة مستقبلاً.','إجراء البحوث والتدقيق والتحقق من صحة البيانات.'],
-    exp4Title:'مشاريع شخصية · تقنية وتطوير', exp4Org:'مستقل', exp4Date:'2024 – حتى الآن',
-    exp4List:['لينكس على بلايستيشن 4 (CachyOS): تثبيت لينكس (أرش) على جهاز بلايستيشن 4، مع التغلب على عملية الإقلاع المقفلة، وإعداد التخزين والإخراج وتعريفات النظام.','مولّد الفواتير والإيصالات: تطبيق نقطة بيع عربي (RTL) مبني من الصفر بجافاسكربت — تسجيل دخول متعدد، أرقام فواتير متسلسلة، تسعير شامل الضريبة 15%، تخزين محلي، ومعاينة حية للإيصال.'],
-    volTitle:'التطوع',
-    vol1Title:'منسق إداري', vol1Org:'فريق مجد التطوعي', vol1Date:'ديسمبر 2025 – مارس 2026',
-    vol1List:['تنظيم المهام الفريقية والحرص على الالتزام بالأسلوب المهني والذوق العام.','مراقبة تدفق العمل وحل الصعوبات الصادرة.'],
-    vol2Title:'متطوع · اليوم العالمي للتطوع', vol2Org:'جمعية نبض التطوعية', vol2Date:'25 – 26 ديسمبر 2025',
-    vol2List:['تعريف الحضور بفكرة التطوع وأهميته وتحفيزهم عليه.','إدارة علاقات الضيوف وتقديم خدمات الضيافة.','تعزيز ثقافة التطوع والمشاركة المجتمعية.'],
-    skillsTitle:'المهارات', techLabel:'▸ تقنية وتحليلية', leadLabel:'▸ قيادية وشخصية', langSkillLabel:'▸ لغات وأدوات',
-    tech:['البحث العلمي وجمع البيانات','تدقيق وتحليل البيانات','كتابة المحتوى والكتابة الإعلانية','إدارة قواعد البيانات','إجادة الحاسب الآلي (MS Office/Excel)','Python','Java','JavaScript','HTML & CSS','JSON','Linux','حل مشكلات العتاد','تطوير تطبيقات نقاط البيع'],
-    lead:['التواصل الفعّال','إدارة المجموعات والقيادة','بناء العلاقات والتواصل المهني','المرونة وإدارة الأزمات','ابتكار الأفكار والعصف الذهني','الإشراف على الفريق'],
-    langSkills:['العربية — اللغة الأم','الإنجليزية — طلاقة','Python','Java','JavaScript','HTML/CSS','Linux','CachyOS','MS Office','تحليل البيانات'],
-    eduTitle:'التعليم والشهادات',
-    edu1:'دبلوم علوم الحاسب', edu1Org:'جامعة الملك فيصل', edu1Date:'أغسطس 2025 – حالياً (خريج 2027)',
-    edu2:'الثانوية العامة · علمي', edu2Org:'مدرسة عرفات الثانوية العامة',
-    certLabel:'▸ الشهادات التدريبية',
-    certs:['السكرتارية الإدارية وإدارة المكتب','إدارة الموارد البشرية','أساسيات الأمن السيبراني','تدريب المدربين','التميز المهني والمهارات','مهارات الحاسب','إعمار H.T.I'],
-    langLabel:'▸ اللغات', langs:['العربية — اللغة الأم','الإنجليزية — طلاقة'],
-    contactTitle:'تواصل',
-    terminal:[
-      '<span class="prompt">زائر@يعقوب</span>:~$ من_أنا',
-      'يعقوب انور باصرة — طالب علوم حاسب، مقيم في جدة',
-      '<span class="prompt">زائر@يعقوب</span>:~$ عرض_جهات_الاتصال',
-      'البريد : Yaaqobbasurra@gmail.com',
-      'لينكدإن : يعقوب باصرة',
-      'الموقع : جدة، المملكة العربية السعودية',
-      '<span class="prompt">زائر@يعقوب</span>:~$ _'
-    ],
-    themeBtn:['🌙 ليل','☀ نهار'], langBtn:'EN / إنجليزي',
-    foot:'✦ يعقوب باصرة · yaaqobbasurra@gmail.com ✦'
-  };
-
-  let lang = 'en';
-  let night = false;
-
-  function ul(id, items){
-    document.getElementById(id).innerHTML = items.map(i=>`<li>${i}</li>`).join('');
-  }
-  function tags(id, items){
-    document.getElementById(id).innerHTML = items.map(i=>`<span class="tag">${i}</span>`).join('');
-  }
-  function belt(id, items){
-    const doubled = items.concat(items);
-    document.getElementById(id).innerHTML = doubled.map(i=>`<span class="belt-item">${i}</span>`).join('');
-  }
-  function refreshGlitch(){
-    document.querySelectorAll('.glitch').forEach(el=>{
-      el.setAttribute('data-text', el.textContent);
-    });
-  }
-
-  function render(){
-    const t = lang==='en' ? EN : AR;
-    document.title = t.title;
-    document.documentElement.classList.toggle('lang-ar', lang==='ar');
-    document.documentElement.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
-
-    const navBtns = document.querySelectorAll('.menu-link');
-    navBtns.forEach((b,i)=> b.textContent = t.nav[i]);
-
-    document.getElementById('tHome').textContent = t.tHome;
-    document.getElementById('tExp').textContent = t.tExp;
-    document.getElementById('tVol').textContent = t.tVol;
-    document.getElementById('tSkills').textContent = t.tSkills;
-    document.getElementById('tEdu').textContent = t.tEdu;
-    document.getElementById('tContact').textContent = t.tContact;
-
-    document.getElementById('heroName').textContent = t.heroName;
-    document.getElementById('heroRole').textContent = t.heroRole;
-    document.getElementById('heroSummary').textContent = t.heroSummary;
-    document.getElementById('mailBtn').textContent = t.mail;
-    document.getElementById('liBtn').textContent = t.li;
-    document.getElementById('locTxt').textContent = t.loc;
-    document.getElementById('ctaWork').textContent = t.ctaWork;
-    document.getElementById('ctaVol').textContent = t.ctaVol;
-    document.getElementById('ctaSkills').textContent = t.ctaSkills;
-    document.getElementById('ctaEdu').textContent = t.ctaEdu;
-
-    document.getElementById('expTitle').textContent = t.expTitle;
-    document.getElementById('exp1Title').textContent = t.exp1Title;
-    document.getElementById('exp1Org').textContent = t.exp1Org;
-    document.getElementById('exp1Date').textContent = t.exp1Date;
-    ul('exp1List', t.exp1List);
-    document.getElementById('exp2Title').textContent = t.exp2Title;
-    document.getElementById('exp2Org').textContent = t.exp2Org;
-    document.getElementById('exp2Date').textContent = t.exp2Date;
-    ul('exp2List', t.exp2List);
-    document.getElementById('exp3Title').textContent = t.exp3Title;
-    document.getElementById('exp3Org').textContent = t.exp3Org;
-    document.getElementById('exp3Date').textContent = t.exp3Date;
-    ul('exp3List', t.exp3List);
-    document.getElementById('exp4Title').textContent = t.exp4Title;
-    document.getElementById('exp4Org').textContent = t.exp4Org;
-    document.getElementById('exp4Date').textContent = t.exp4Date;
-    ul('exp4List', t.exp4List);
-
-    document.getElementById('volTitle').textContent = t.volTitle;
-    document.getElementById('vol1Title').textContent = t.vol1Title;
-    document.getElementById('vol1Org').textContent = t.vol1Org;
-    document.getElementById('vol1Date').textContent = t.vol1Date;
-    ul('vol1List', t.vol1List);
-    document.getElementById('vol2Title').textContent = t.vol2Title;
-    document.getElementById('vol2Org').textContent = t.vol2Org;
-    document.getElementById('vol2Date').textContent = t.vol2Date;
-    ul('vol2List', t.vol2List);
-
-    document.getElementById('skillsTitle').textContent = t.skillsTitle;
-    document.getElementById('techLabel').textContent = t.techLabel;
-    document.getElementById('leadLabel').textContent = t.leadLabel;
-    document.getElementById('langSkillLabel').textContent = t.langSkillLabel;
-    belt('techBelt', t.tech);
-    belt('leadBelt', t.lead);
-    belt('langBelt', t.langSkills);
-
-    document.getElementById('eduTitle').textContent = t.eduTitle;
-    document.getElementById('edu1').textContent = t.edu1;
-    document.getElementById('edu1Org').textContent = t.edu1Org;
-    document.getElementById('edu1Date').textContent = t.edu1Date;
-    document.getElementById('edu2').textContent = t.edu2;
-    document.getElementById('edu2Org').textContent = t.edu2Org;
-    document.getElementById('certLabel').textContent = t.certLabel;
-    tags('certTags', t.certs);
-    document.getElementById('langLabel').textContent = t.langLabel;
-    tags('langTags', t.langs);
-
-    document.getElementById('contactTitle').textContent = t.contactTitle;
-    document.getElementById('terminalBox').innerHTML = t.terminal.map(l=>`<div>${l}${l.endsWith('_')?'<span class=\"cursor\"></span>':''}</div>`).join('');
-
-    document.getElementById('themeToggle').textContent = night ? t.themeBtn[1] : t.themeBtn[0];
-    document.getElementById('langToggle').textContent = t.langBtn;
-    document.getElementById('footNote').textContent = t.foot;
-
-    refreshGlitch();
-  }
-
-  function flash(){
-    const f = document.getElementById('flicker');
-    f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
-  }
-
-  function goPage(id){
-    flash();
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.menu-link').forEach(b=>b.classList.remove('active'));
-    document.getElementById('page-'+id).classList.add('active');
-    document.querySelector(`.menu-link[data-page="${id}"]`).classList.add('active');
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  document.querySelectorAll('[data-page]').forEach(el=>{
-    el.addEventListener('click', ()=> goPage(el.getAttribute('data-page')));
-  });
-
-  document.getElementById('themeToggle').addEventListener('click', ()=>{
-    night = !night;
-    document.body.classList.toggle('night', night);
-    render();
-  });
-
-  document.getElementById('langToggle').addEventListener('click', ()=>{
-    lang = lang==='en' ? 'ar' : 'en';
-    flash();
-    render();
-  });
-
-  render();
-})();
-</script>
+<script src="app.js" defer></script>
 </body>
 </html>
