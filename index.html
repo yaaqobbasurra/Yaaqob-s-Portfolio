@@ -3,232 +3,472 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Yaaqob Ba Surra</title>
+<title>Yaaqob Ba Surra — Developer Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<style>
+  :root{
+    --sky-a-day:#ffd7ec; --sky-b-day:#c9b6ff; --sky-c-day:#ffb199;
+    --sky-a-night:#040012; --sky-b-night:#2a0a4e; --sky-c-night:#7a2d64;
+    --pink:#ff2ea6; --cyan:#00d8e6; --purple:#8a5cff; --yellow:#ffd85e;
+    --ink:#171018; --paper:#f4efe6;
+    --grid-line: rgba(23,16,24,0.35);
+    --text: var(--ink);
+    --text-soft: rgba(23,16,24,.75);
+    --text-faint: rgba(23,16,24,.45);
+    --rule: rgba(23,16,24,.2);
+  }
+  body.night{
+    --text:#f4efe6;
+    --text-soft: rgba(244,239,230,.8);
+    --text-faint: rgba(244,239,230,.45);
+    --rule: rgba(244,239,230,.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Space Mono', monospace;
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+    transition: color .5s ease;
+  }
+  html.lang-ar body{font-family:'Cairo', sans-serif;}
+
+  /* BACKDROP */
+  .sky{
+    position:fixed; inset:0; z-index:-3; overflow:hidden;
+    background:linear-gradient(180deg, var(--sky-a-day) 0%, var(--sky-b-day) 45%, var(--sky-c-day) 78%, var(--sky-c-day) 100%);
+    transition:background 1s ease;
+  }
+  body.night .sky{
+    background:linear-gradient(180deg, var(--sky-a-night) 0%, var(--sky-b-night) 55%, var(--sky-c-night) 100%);
+  }
+  .stars{position:absolute; inset:0; opacity:0; transition:opacity 1s ease;}
+  body.night .stars{opacity:1;}
+  .star{position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+  .sun{
+    position:absolute; top:14%; left:50%; transform:translateX(-50%);
+    width:200px; height:200px; border-radius:50%;
+    background:repeating-linear-gradient(0deg, var(--pink) 0 10px, var(--yellow) 10px 20px);
+    box-shadow:0 0 0 3px var(--ink);
+    transition:background 1s ease, box-shadow 1s ease;
+    animation:bob 9s ease-in-out infinite;
+  }
+  body.night .sun{
+    background:radial-gradient(circle at 35% 35%, #f4f0ff 0%, #cfc7ea 55%, #9b93c2 100%);
+    box-shadow:0 0 60px rgba(200,190,255,.7), 0 0 0 3px var(--ink);
+  }
+  @keyframes bob{ 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(16px);} }
+
+  .floor{
+    position:absolute; left:0; right:0; bottom:0; height:38%;
+    background-image:
+      linear-gradient(var(--grid-line) 2px, transparent 2px),
+      linear-gradient(90deg, var(--grid-line) 2px, transparent 2px);
+    background-size:60px 40px;
+    background-color: rgba(255,255,255,0.12);
+    transform:perspective(300px) rotateX(60deg);
+    transform-origin:bottom;
+    animation:floorMove 6s linear infinite;
+  }
+  @keyframes floorMove{ from{background-position:0 0, 0 0;} to{background-position:0 40px, 60px 0;} }
+
+  /* CRT OVERLAY */
+  .crt{
+    position:fixed; inset:0; z-index:50; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:multiply;
+  }
+
+  /* NAVIGATION */
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    background:rgba(244,239,230,.88);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--rule);
+    padding:.8rem 1.6rem;
+    transition:background .5s ease;
+  }
+  body.night .nav{ background:rgba(15,8,24,.85); }
+
+  .brand{font-family:'VT323', monospace; font-size:1.5rem; letter-spacing:2px; color:var(--text); text-decoration:none;}
+  html.lang-ar .brand{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0;}
+
+  .nav-links{display:flex; gap:.4rem;}
+  .nav-link{
+    font-family:'VT323', monospace; font-size:1.1rem; letter-spacing:1px;
+    background:transparent; border:0; color:var(--text-soft);
+    padding:.3rem .8rem; cursor:pointer; text-transform:uppercase; text-decoration:none;
+  }
+  html.lang-ar .nav-link{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700;}
+  .nav-link:hover{ color:var(--pink); }
+
+  .nav-right{display:flex; gap:.5rem;}
+  .btn-ui{
+    font-family:'VT323', monospace; font-size:1rem;
+    border:1px solid var(--rule); background:transparent; color:var(--text);
+    padding:.3rem .7rem; cursor:pointer; font-weight:bold;
+    transition:all .2s ease;
+  }
+  html.lang-ar .btn-ui{font-family:'Cairo',sans-serif; font-size:.8rem;}
+  .btn-ui:hover{ background:var(--pink); color:#fff; border-color:var(--pink); }
+
+  /* MAIN CONTENT */
+  main{ position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:8rem 2rem 5rem; }
+
+  /* HERO */
+  #hero{ margin-bottom:5rem; }
+  .kicker{
+    font-family:'VT323', monospace; font-size:1.2rem; letter-spacing:3px;
+    color:var(--pink); margin-bottom:.8rem; text-transform:uppercase;
+  }
+  html.lang-ar .kicker{font-family:'Cairo',sans-serif; font-weight:800; font-size:.9rem; letter-spacing:0;}
+
+  #hero h1{
+    font-family:'VT323', monospace; font-size: clamp(3.2rem, 8vw, 6.5rem);
+    line-height:.95; letter-spacing:-1px; margin-bottom:1.5rem;
+  }
+  html.lang-ar #hero h1{font-family:'Cairo',sans-serif; font-weight:800; font-size:clamp(2.2rem,5vw,3.5rem);}
+
+  .tagline{
+    font-size: clamp(1rem, 1.4vw, 1.2rem); line-height:1.7;
+    max-width: 55ch; color:var(--text-soft); margin-bottom:2rem;
+  }
+
+  .cta-row{ display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+  .btn-action{
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-family:'VT323', monospace; font-size:1.2rem; text-decoration:none;
+    padding:.6rem 1.4rem; background:var(--pink); color:#fff; border:2px solid var(--pink);
+    transition:transform .2s ease, background .2s ease;
+  }
+  html.lang-ar .btn-action{font-family:'Cairo',sans-serif; font-size:.9rem; font-weight:800;}
+  .btn-action:hover{ transform:translateY(-2px); background:transparent; color:var(--pink); }
+
+  .btn-secondary{
+    background:transparent; color:var(--text); border:2px solid var(--rule);
+  }
+  .btn-secondary:hover{ border-color:var(--text); color:var(--text); background:transparent; }
+
+  /* SECTION HEADINGS */
+  .section-head{
+    display:flex; align-items:baseline; gap:1rem; margin:4rem 0 2rem;
+    border-bottom:1px solid var(--rule); padding-bottom:.8rem;
+  }
+  .section-head .num{ font-family:'VT323', monospace; font-size:1.2rem; color:var(--pink); }
+  .section-head h2{ font-family:'VT323', monospace; font-size:2.2rem; font-weight:400; }
+  html.lang-ar .section-head h2{font-family:'Cairo',sans-serif; font-weight:800; font-size:1.5rem;}
+
+  /* PROJECTS */
+  .project{
+    display:grid; grid-template-columns: 1.1fr 1fr; gap:3rem;
+    padding:3.5rem 0; border-bottom:1px solid var(--rule); align-items:center;
+  }
+  .project:last-child{ border-bottom:0; }
+  .project:nth-child(even){ direction:rtl; }
+  .project:nth-child(even) > *{ direction:ltr; }
+  html.lang-ar .project:nth-child(even){ direction:ltr; }
+  html.lang-ar .project:nth-child(even) > *{ direction:rtl; }
+
+  .project h3{
+    font-family:'VT323', monospace; font-size: clamp(2rem, 3.5vw, 2.8rem);
+    line-height:1.1; margin-bottom:.5rem;
+  }
+  html.lang-ar .project h3{font-family:'Cairo',sans-serif; font-weight:800; font-size:clamp(1.4rem,2.5vw,1.8rem);}
+
+  .project .p-meta{
+    font-family:'VT323', monospace; font-size:1.05rem; letter-spacing:1px;
+    color:var(--purple); margin-bottom:1.2rem; text-transform:uppercase;
+  }
+  html.lang-ar .project .p-meta{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:700;}
+
+  .project p{ font-size:1rem; line-height:1.8; color:var(--text-soft); margin-bottom:1rem; }
+
+  .p-tags{ display:flex; flex-wrap:wrap; gap:.4rem; margin:1.5rem 0; }
+  .p-tags span{
+    font-family:'VT323', monospace; font-size:.85rem;
+    color:var(--text-soft); border:1px solid var(--rule); padding:.2rem .6rem;
+  }
+  html.lang-ar .p-tags span{font-family:'Cairo',sans-serif; font-size:.75rem; font-weight:700;}
+
+  .p-links{ display:flex; gap:1rem; margin-top:1.5rem; }
+  .p-link{
+    font-family:'VT323', monospace; font-size:1.1rem; color:var(--text);
+    text-decoration:none; border-bottom:2px solid var(--pink); padding-bottom:2px;
+    transition:color .2s ease;
+  }
+  html.lang-ar .p-link{font-family:'Cairo',sans-serif; font-size:.85rem; font-weight:800;}
+  .p-link:hover{ color:var(--pink); }
+
+  /* VISUALS */
+  .p-vis{ display:flex; align-items:center; justify-content:center; min-height:280px; }
+
+  /* RECEIPT */
+  .prcpt{
+    background:#fff; color:#171018; padding:1.2rem; width:100%; max-width:270px;
+    font-family:'Cairo', sans-serif; font-size:.85rem; box-shadow:0 20px 40px rgba(0,0,0,.2);
+    border:1.5px dashed #171018; transform:rotate(-1deg); transition:transform .3s ease;
+  }
+  .prcpt:hover{ transform:rotate(0deg) scale(1.02); }
+  .prcpt .t{ text-align:center; font-weight:800; border-bottom:1px dashed #171018; padding-bottom:.4rem; margin-bottom:.6rem; }
+  .prcpt .r{ display:flex; justify-content:space-between; padding:.2rem 0; }
+  .prcpt .tot{ border-top:1px dashed #171018; margin-top:.6rem; padding-top:.4rem; font-weight:800; }
+  .prcpt small{ display:block; text-align:center; margin-top:.6rem; color:#888; font-size:.65rem; }
+
+  /* TERMINAL */
+  .pterm{
+    background:#0c0812; color:#d8f5d0; font-family:'VT323', monospace; font-size:1.2rem;
+    padding:1.2rem; width:100%; max-width:380px; border:1px solid rgba(216,245,208,.3);
+    box-shadow:0 20px 40px rgba(0,0,0,.4);
+  }
+  .pterm .bar{ display:flex; gap:.3rem; margin-bottom:.8rem; border-bottom:1px solid rgba(216,245,208,.15); padding-bottom:.4rem; }
+  .pterm .bar i{ width:8px; height:8px; border-radius:50%; background:rgba(216,245,208,.4); }
+  .pterm .y{ color:#ffd85e; } .pterm .g{ color:#7be28b; } .pterm .c{ color:#00d8e6; }
+
+  /* SKILLS GRID */
+  .tech-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-top:2rem;
+  }
+  .tech-card{
+    border:1px solid var(--rule); padding:1.5rem; background:rgba(255,255,255,.03);
+    transition:border-color .2s ease;
+  }
+  .tech-card:hover{ border-color:var(--pink); }
+  .tech-card h4{ font-family:'VT323', monospace; font-size:1.3rem; color:var(--pink); margin-bottom:.5rem; }
+  html.lang-ar .tech-card h4{ font-family:'Cairo',sans-serif; font-weight:800; font-size:1rem; }
+  .tech-card p{ font-size:.9rem; color:var(--text-soft); line-height:1.6; }
+
+  /* FOOTER & TERMINAL CONTACT */
+  #contact{ margin-top:4rem; }
+  .terminal{
+    font-family:'VT323', monospace; font-size:1.3rem; line-height:1.8;
+    background:rgba(0,0,0,.05); padding:1.5rem; border:1px dashed var(--rule);
+  }
+  html.lang-ar .terminal{ font-family:'Cairo',sans-serif; font-size:.95rem; }
+  .terminal a{ color:var(--cyan); text-decoration:none; }
+  .terminal a:hover{ text-decoration:underline; }
+
+  footer{ text-align:center; font-family:'VT323', monospace; font-size:1rem; color:var(--text-faint); padding:4rem 0 2rem; }
+  html.lang-ar footer{ font-family:'Cairo',sans-serif; font-size:.8rem; }
+
+  @media (max-width: 768px){
+    main{ padding-top:6rem; }
+    .project{ grid-template-columns:1fr; gap:2rem; }
+    .project:nth-child(even){ direction:ltr; }
+    .nav{ padding:.6rem 1rem; }
+  }
+</style>
 </head>
 <body>
 
 <div class="sky">
   <div class="stars" id="stars"></div>
   <div class="sun"></div>
-  <div class="cloud" style="width:140px;height:44px; top:12%; left:8%; animation-duration:42s;"></div>
-  <div class="cloud" style="width:180px;height:52px; top:24%; left:60%; animation-duration:56s; animation-delay:-12s;"></div>
-  <div class="cloud" style="width:110px;height:36px; top:34%; left:35%; animation-duration:48s; animation-delay:-24s;"></div>
   <div class="floor"></div>
 </div>
 
-<div class="hero-palm" aria-hidden="true">
-  <svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">
-    <g class="trunk">
-      <path class="trunk-fill" d="M142 520 C138 460, 130 400, 138 340 C146 285, 152 240, 158 190 C160 175, 168 165, 182 160 L188 168 C176 174, 170 184, 168 196 C162 240, 156 288, 148 342 C142 400, 150 462, 154 520 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M132 470 L158 470 L158 476 L132 476 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M130 420 L160 420 L160 426 L130 426 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M132 370 L163 370 L163 376 L132 376 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M138 320 L167 320 L167 326 L138 326 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M146 270 L170 270 L170 276 L146 276 Z"/>
-      <path class="trunk-fill" opacity=".35" d="M154 220 L178 220 L178 226 L154 226 Z"/>
-    </g>
-    <g class="crown">
-      <circle class="trunk-fill" cx="166" cy="168" r="6"/>
-      <circle class="trunk-fill" cx="180" cy="170" r="6"/>
-      <circle class="trunk-fill" cx="174" cy="180" r="5"/>
-      <path class="frond-a" d="M182 160 C120 130, 50 130, 10 168 C50 152, 110 152, 178 168 Z"/>
-      <path class="frond-b" d="M180 162 C110 152, 40 176, 18 220 C60 190, 120 180, 176 176 Z"/>
-      <path class="frond-c" d="M182 160 C130 172, 80 210, 70 258 C100 220, 150 190, 180 176 Z"/>
-      <path class="frond-a" d="M186 158 C250 128, 320 128, 360 166 C320 150, 260 150, 190 166 Z"/>
-      <path class="frond-b" d="M188 160 C256 150, 324 176, 346 218 C304 188, 244 178, 190 174 Z"/>
-      <path class="frond-c" d="M186 160 C240 172, 288 210, 298 256 C268 218, 220 190, 190 176 Z"/>
-      <path class="frond-b" d="M184 158 C172 110, 172 60, 194 30 C196 70, 192 120, 186 158 Z"/>
-      <path class="frond-c" d="M184 158 C200 118, 228 84, 260 80 C240 110, 210 138, 186 158 Z"/>
-      <path class="frond-c" d="M182 160 C168 122, 140 92, 108 92 C130 118, 158 142, 182 160 Z"/>
-      <path class="frond-c" d="M182 162 C150 196, 140 240, 150 292 C168 246, 178 204, 184 168 Z"/>
-    </g>
-  </svg>
-</div>
-
 <div class="crt"></div>
-<div class="roll-band"></div>
-<div class="tv-burst" id="tvBurst"></div>
 
 <nav class="nav">
-  <div class="brand">YAAQOB.SYS</div>
-  <div class="nav-links" id="navLinks">
-    <button class="nav-link active" data-target="hero" data-i18n="nav.home">Home</button>
-    <button class="nav-link" data-target="work" data-i18n="nav.work">Work</button>
-    <button class="nav-link" data-target="about" data-i18n="nav.about">About</button>
-    <button class="nav-link" data-target="contact" data-i18n="nav.contact">Contact</button>
+  <a href="#hero" class="brand">YAAQOB.DEV</a>
+  <div class="nav-links">
+    <a href="#work" class="nav-link" data-en="Work" data-ar="الأعمال">Work</a>
+    <a href="#skills" class="nav-link" data-en="Stack" data-ar="التقنيات">Stack</a>
+    <a href="#contact" class="nav-link" data-en="Contact" data-ar="تواصل">Contact</a>
   </div>
   <div class="nav-right">
-    <button id="themeToggle">🌙</button>
-    <button id="langToggle">AR</button>
+    <button class="btn-ui" id="themeToggle">🌙</button>
+    <button class="btn-ui" id="langToggle">AR</button>
   </div>
 </nav>
 
 <main>
 
+  <!-- HERO -->
   <section id="hero">
-    <div class="kicker" data-i18n="hero.kicker"></div>
-    <h1 data-i18n="hero.name"></h1>
-    <p class="tagline" data-i18n="hero.tagline"></p>
-    <div class="contact-line">
-      <a id="mailLink" href="mailto:Yaaqobbasurra@gmail.com" data-i18n="hero.mail"></a>
-      <a id="ghLink" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-i18n="hero.gh"></a>
-      <a id="liLink" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener" data-i18n="hero.li"></a>
-      <span data-i18n="hero.loc"></span>
+    <div class="kicker" id="heroKicker">Software Developer · Systems & Web</div>
+    <h1 id="heroName">Yaaqob Ba Surra</h1>
+    <p class="tagline" id="heroTagline"></p>
+    <div class="cta-row">
+      <a class="btn-action" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">
+        <span>GitHub</span> ↗
+      </a>
+      <a class="btn-action btn-secondary" href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">
+        <span>LinkedIn</span> ↗
+      </a>
     </div>
   </section>
 
+  <!-- WORK -->
   <section id="work">
     <div class="section-head">
       <span class="num">01</span>
-      <h2 data-i18n="work.title"></h2>
+      <h2 data-en="Featured Projects" data-ar="المشاريع المختارة">Featured Projects</h2>
     </div>
 
+    <!-- PROJECT 1 -->
     <article class="project">
       <div class="p-text">
-        <h3 data-i18n="projects.app.title"></h3>
-        <div class="p-meta" data-i18n="projects.app.meta"></div>
-        <p data-i18n="projects.app.p1"></p>
-        <p data-i18n="projects.app.p2"></p>
-        <div class="p-tags" data-i18n-tags="projects.app.tags"></div>
+        <h3 data-en="Emergency Web POS & Receipt Engine" data-ar="محرك إيصالات ونقاط بيع للطوارئ">Emergency Web POS & Receipt Engine</h3>
+        <div class="p-meta" data-en="Client-Side Web App · Built in 24 Hours" data-ar="تطبيق ويب عملي · بني خلال 24 ساعة">Client-Side Web App · Built in 24 Hours</div>
+        <p data-en="When an active shop's primary POS database crashed overnight, I engineered a zero-dependency web-based checkout system to prevent business downtime." data-ar="عندما تعطلت قاعدة بيانات نقاط البيع الرئيسية لأحد المحلات، قمت بتطوير نظام كاشير وإيصالات يعمل عبر المتصفح بدون أي مكتبات خارجية لتجنب توقف المبيعات.">When an active shop's primary POS database crashed overnight, I engineered a zero-dependency web-based checkout system to prevent business downtime.</p>
+        <p data-en="Features multi-user sessions, sequential invoice indexing, VAT calculation, dynamic RTL receipt previews, browser storage recovery, and instant thermal printing output." data-ar="يتضمن جلسات دخول متعددة، ترقيم متسلسل للفواتير، حساب القيمة المضافة، معاينة حية للإيصال بدعم للغة العربية، وحفظ البيانات محلياً مع الطباعة الحرارية.">Features multi-user sessions, sequential invoice indexing, VAT calculation, dynamic RTL receipt previews, browser storage recovery, and instant thermal printing output.</p>
+        <div class="p-tags">
+          <span>JavaScript (ES6)</span><span>DOM Manipulation</span><span>localStorage</span><span>RTL Printing</span>
+        </div>
+        <div class="p-links">
+          <a class="p-link" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-en="View Source Code ↗" data-ar="عرض الكود البرمجي ↗">View Source Code ↗</a>
+        </div>
       </div>
       <div class="p-vis">
-        <div class="appflow" aria-hidden="true">
-          <div class="appbar"><i></i><i></i><i></i><span>REVIEW PANEL</span></div>
-          <div class="app-title">APPLICATION DETAILS</div>
-          <div class="app-row"><span class="label">Applicant</span><span class="value">New submission</span></div>
-          <div class="app-row"><span class="label">Source</span><span class="value">Google Sheets</span></div>
-          <div class="app-row"><span class="label">Status</span><span class="status">Pending review</span></div>
-          <div class="app-actions"><span>ACCEPT</span><span>DECLINE</span></div>
+        <div class="prcpt" id="receiptBox">
+          <!-- Dynamically Injected via JS -->
         </div>
       </div>
     </article>
 
+    <!-- PROJECT 2 -->
     <article class="project">
       <div class="p-text">
-        <h3 data-i18n="projects.receipt.title"></h3>
-        <div class="p-meta" data-i18n="projects.receipt.meta"></div>
-        <p data-i18n="projects.receipt.p1"></p>
-        <p data-i18n="projects.receipt.p2"></p>
-        <p data-i18n="projects.receipt.p3"></p>
-        <div class="p-tags" data-i18n-tags="projects.receipt.tags"></div>
-      </div>
-      <div class="p-vis">
-        <div class="prcpt">
-          <div class="t">إيصال بيع</div>
-          <div class="r"><span>منتج ١</span><span>٤٠٫٠٠</span></div>
-          <div class="r"><span>منتج ٢</span><span>٢٥٫٠٠</span></div>
-          <div class="r tot"><span>الإجمالي</span><span>٦٥٫٠٠</span></div>
-          <small>sample · receipt-maker.exe</small>
+        <h3 data-en="PS4 Arch Linux Kernel Adaptation" data-ar="تطويع نواة أرتش لينكس لجهاز PS4">PS4 Arch Linux Kernel Adaptation</h3>
+        <div class="p-meta" data-en="Hardware & Bootchain Engineering" data-ar="هندسة العتاد وسلسلة الإقلاع">Hardware & Bootchain Engineering</div>
+        <p data-en="Overcame locked bootloader restrictions on PlayStation 4 hardware to establish a stable CachyOS (Arch-based Linux) environment." data-ar="تجاوزت قيود أداة الإقلاع المقفلة على جهاز بلايستيشن 4 لإنشاء بيئة عمل مستقرة بنظام CachyOS المبني على أرتش لينكس.">Overcame locked bootloader restrictions on PlayStation 4 hardware to establish a stable CachyOS (Arch-based Linux) environment.</p>
+        <p data-en="Handled kernel parameter matching, payload patching, memory mapping, and resolving driver/display output issues without official system documentation." data-ar="عالجت التوافق بين النواة وملفات الإقلاع البدائية، وتتبع خرائط الذاكرة، وحل مشكلات التعريفات وشاشات العرض بدون وثائق رسمية.">Handled kernel parameter matching, payload patching, memory mapping, and resolving driver/display output issues without official system documentation.</p>
+        <div class="p-tags">
+          <span>Linux Kernel</span><span>CachyOS</span><span>bzImage/initramfs</span><span>Hardware Diagnostics</span>
         </div>
-      </div>
-    </article>
-
-    <article class="project">
-      <div class="p-text">
-        <h3 data-i18n="projects.ps4.title"></h3>
-        <div class="p-meta" data-i18n="projects.ps4.meta"></div>
-        <p data-i18n="projects.ps4.p1"></p>
-        <p data-i18n="projects.ps4.p2"></p>
-        <p data-i18n="projects.ps4.p3"></p>
-        <div class="p-tags" data-i18n-tags="projects.ps4.tags"></div>
+        <div class="p-links">
+          <a class="p-link" href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-en="Documentation & Logs ↗" data-ar="التوثيق والسجلات ↗">Documentation & Logs ↗</a>
+        </div>
       </div>
       <div class="p-vis">
         <div class="pterm">
           <div class="bar"><i></i><i></i><i></i></div>
-          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load kernel</span>
-          <span class="l">&nbsp;&nbsp;checking bzImage... <span class="r">?</span></span>
-          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ load initramfs</span>
-          <span class="l">&nbsp;&nbsp;checking initramfs... <span class="r">?</span></span>
-          <span class="l"><span class="c">ps4@local</span>:<span class="y">~</span>$ do they match?</span>
-          <span class="l">&nbsp;&nbsp;scanning... <span class="r">..</span></span>
-          <span class="l">&nbsp;&nbsp;scanning... <span class="r">.....</span></span>
-          <span class="l g">&nbsp;&nbsp;yes. finally. booting.</span>
+          <div><span class="c">root@ps4-cachy</span>:<span class="y">~</span># uname -r</div>
+          <div>6.8.9-cachyos-ps4</div>
+          <div><span class="c">root@ps4-cachy</span>:<span class="y">~</span># status</div>
+          <div>GPU: Driver Loaded [<span class="g">OK</span>]</div>
+          <div>Display: 1080p @ 60Hz [<span class="g">OK</span>]</div>
+          <div>Bootchain: Fully Verified [<span class="g">OK</span>]</div>
         </div>
       </div>
     </article>
   </section>
 
-  <section id="about">
+  <!-- STACK -->
+  <section id="skills">
     <div class="section-head">
       <span class="num">02</span>
-      <h2 data-i18n="about.title"></h2>
+      <h2 data-en="Technical Focus" data-ar="التركيز التقني">Technical Focus</h2>
     </div>
 
-    <p class="about-intro" data-i18n="about.intro"></p>
-
-    <div class="about-grid">
-      <div class="about-col">
-        <h4 data-i18n="about.expTitle"></h4>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.w1r"></div>
-          <div class="e-org" data-i18n="about.w1o"></div>
-          <div class="e-date" data-i18n="about.w1d"></div>
-        </div>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.w2r"></div>
-          <div class="e-org" data-i18n="about.w2o"></div>
-          <div class="e-date" data-i18n="about.w2d"></div>
-        </div>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.w3r"></div>
-          <div class="e-org" data-i18n="about.w3o"></div>
-          <div class="e-date" data-i18n="about.w3d"></div>
-        </div>
-
-        <h4 class="col-gap" data-i18n="about.volTitle"></h4>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.v1r"></div>
-          <div class="e-org" data-i18n="about.v1o"></div>
-          <div class="e-date" data-i18n="about.v1d"></div>
-        </div>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.v2r"></div>
-          <div class="e-org" data-i18n="about.v2o"></div>
-          <div class="e-date" data-i18n="about.v2d"></div>
-        </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <h4 data-en="Frontend Development" data-ar="تطوير الواجهات">Frontend Development</h4>
+        <p data-en="Clean vanilla HTML/CSS/JavaScript, responsive layouts, RTL/LTR localization, dynamic DOM systems." data-ar="بناء واجهات باستخدام HTML/CSS/JavaScript، تصميم متجاوب، دعم كامل للغتين العربية والإنجليزية.">Clean vanilla HTML/CSS/JavaScript, responsive layouts, RTL/LTR localization, dynamic DOM systems.</p>
       </div>
-
-      <div class="about-col">
-        <h4 data-i18n="about.eduTitle"></h4>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.e1r"></div>
-          <div class="e-org" data-i18n="about.e1o"></div>
-          <div class="e-date" data-i18n="about.e1d"></div>
-        </div>
-        <div class="entry">
-          <div class="e-role" data-i18n="about.e2r"></div>
-          <div class="e-org" data-i18n="about.e2o"></div>
-        </div>
-
-        <h4 class="col-gap" data-i18n="about.skillsTitle"></h4>
-        <div class="tag-cloud" data-i18n-tags="about.skills"></div>
-
-        <h4 class="col-gap" data-i18n="about.langTitle"></h4>
-        <div class="tag-cloud" data-i18n-tags="about.langs"></div>
+      <div class="tech-card">
+        <h4 data-en="Systems & Linux" data-ar="الأنظمة ولينكس">Systems & Linux</h4>
+        <p data-en="Linux environment configuration, shell scripting, hardware troubleshooting, kernel patching." data-ar="تهيئة بيئات لينكس، كتابة أسكريبتات الشل، فحص مشاكل العتاد، وتتبع أخطاء النظام.">Linux environment configuration, shell scripting, hardware troubleshooting, kernel patching.</p>
+      </div>
+      <div class="tech-card">
+        <h4 data-en="Core Languages" data-ar="لغات البرمجة">Core Languages</h4>
+        <p data-en="Python, Java, JavaScript (ES6+), SQL database structure & management." data-ar="بايثون، جافا، جافاسكربت، وبناء وإدارة قواعد البيانات SQL.">Python, Java, JavaScript (ES6+), SQL database structure & management.</p>
       </div>
     </div>
   </section>
 
+  <!-- CONTACT -->
   <section id="contact">
     <div class="section-head">
       <span class="num">03</span>
-      <h2 data-i18n="contact.title"></h2>
+      <h2 data-en="Get In Touch" data-ar="التواصل">Get In Touch</h2>
     </div>
-    <div class="terminal" id="terminalBox"></div>
-    <div class="social-row">
-      <a href="mailto:Yaaqobbasurra@gmail.com" data-i18n="contact.socMail"></a>
-      <a href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener" data-i18n="contact.socGh"></a>
-      <a href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener" data-i18n="contact.socLi"></a>
+
+    <div class="terminal">
+      <div><span style="color:var(--pink)">yaaqob@dev</span>:~$ cat contact_info.txt</div>
+      <div>Email    : <a href="mailto:Yaaqobbasurra@gmail.com">Yaaqobbasurra@gmail.com</a></div>
+      <div>GitHub   : <a href="https://github.com/yaaqobbasurra" target="_blank" rel="noopener">github.com/yaaqobbasurra</a></div>
+      <div>LinkedIn : <a href="https://linkedin.com/in/yaaqob-ba-surra-00b6a5390" target="_blank" rel="noopener">linkedin.com/in/yaaqob-ba-surra</a></div>
+      <div>Location : Jeddah, Saudi Arabia</div>
     </div>
   </section>
 
 </main>
 
-<footer id="footNote"></footer>
+<footer>✦ Yaaqob Ba Surra ✦</footer>
 
-<script src="app.js" defer></script>
+<script>
+(function(){
+  // Starfield Generation
+  const starsWrap = document.getElementById('stars');
+  for(let i=0;i<65;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*70+'%';
+    s.style.animationDelay = (Math.random()*3)+'s';
+    starsWrap.appendChild(s);
+  }
+
+  const EN = {
+    heroTagline: 'Software developer focused on web tools, custom UI solutions, and system-level troubleshooting. I build clean, efficient software for practical problems.',
+    rcpt: `
+      <div class="t">RECEIPT #0482</div>
+      <div class="r"><span>Item #1 (Hardware)</span><span>$40.00</span></div>
+      <div class="r"><span>Item #2 (Service)</span><span>$25.00</span></div>
+      <div class="r tot"><span>Total (Incl. VAT)</span><span>$65.00</span></div>
+      <small>Status: Saved to Browser Storage</small>
+    `
+  };
+
+  const AR = {
+    heroTagline: 'مطور برمجيات مهتم بإنشاء أدوات الويب، حلول الواجهات المخصصة، وتشخيص أخطاء الأنظمة. أبني برمجيات نظيفة وفعالة لحل المشكلات العملية.',
+    rcpt: `
+      <div class="t">إيصال رقم #٠٤٨٢</div>
+      <div class="r"><span>منتج 1 (عتاد)</span><span>٤٠٫٠٠ ر.س</span></div>
+      <div class="r"><span>منتج 2 (خدمة)</span><span>٢٥٫٠٠ ر.س</span></div>
+      <div class="r tot"><span>الإجمالي (شامل الضريبة)</span><span>٦٥٫٠٠ ر.س</span></div>
+      <small>الحالة: تم الحفظ في التخزين المحلي</small>
+    `
+  };
+
+  let lang = 'en';
+  let night = false;
+
+  function render(){
+    const t = lang === 'en' ? EN : AR;
+    document.documentElement.classList.toggle('lang-ar', lang === 'ar');
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+    document.getElementById('heroTagline').textContent = t.heroTagline;
+    document.getElementById('receiptBox').innerHTML = t.rcpt;
+
+    document.querySelectorAll('[data-en]').forEach(el => {
+      el.textContent = el.getAttribute(lang === 'ar' ? 'data-ar' : 'data-en');
+    });
+
+    document.getElementById('langToggle').textContent = lang === 'en' ? 'AR' : 'EN';
+    document.getElementById('themeToggle').textContent = night ? '☀' : '🌙';
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    night = !night;
+    document.body.classList.toggle('night', night);
+    render();
+  });
+
+  document.getElementById('langToggle').addEventListener('click', () => {
+    lang = lang === 'en' ? 'ar' : 'en';
+    render();
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>
