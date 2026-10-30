@@ -331,6 +331,22 @@
   }
 
 
+  /* CV maker project visual */
+  .cv-preview{
+    width:100%; max-width:330px; min-height:350px; padding:1.15rem;
+    background:#fff; color:#171018; border:1px solid rgba(23,16,24,.25);
+    box-shadow:0 22px 55px rgba(0,0,0,.22), 10px 10px 0 rgba(255,46,166,.18);
+    font-family:'Cairo',sans-serif; direction:rtl; text-align:right;
+    transform:rotate(-2deg); animation:appFloat 6s ease-in-out infinite;
+  }
+  body.night .cv-preview{background:#f4efe6;color:#171018;}
+  .cv-preview .cv-top{border-bottom:2px solid #1f4e79;padding-bottom:.65rem;margin-bottom:.8rem;}
+  .cv-preview .cv-name{font-size:1.15rem;font-weight:800;color:#1f4e79;}
+  .cv-preview .cv-contact{font-family:'Space Mono',monospace;font-size:.48rem;color:#555;margin-top:.2rem;}
+  .cv-preview .cv-section{font-size:.67rem;font-weight:800;color:#1f4e79;margin:.7rem 0 .2rem;border-bottom:1px solid #ddd;padding-bottom:.15rem;}
+  .cv-preview .cv-line{font-size:.53rem;line-height:1.8;color:#555;}
+  .cv-preview .cv-chip{display:inline-block;background:#e8eef4;padding:.12rem .38rem;margin:.12rem;font-size:.46rem;}
+
   /* application workflow visual */
   .appflow{
     width:100%; max-width:390px;
